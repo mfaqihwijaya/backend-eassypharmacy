@@ -1,5 +1,5 @@
 const express = require('express');
-const config = require('./src/config/local.json');
+const config = require('./config/local.json');
 
 
 function serveBackend() {
