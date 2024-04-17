@@ -2,5 +2,14 @@
     "server": {
         "host": "localhost",
         "port": 3000
+    },
+    "postgres": {
+        "master": {
+          "host": "127.0.0.1",
+          "port": "5432",
+          "user": "postgres",
+          "password": "123",
+          "database": "eassypharmacy"
+        }
     }
 }
