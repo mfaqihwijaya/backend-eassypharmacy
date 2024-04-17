@@ -10,8 +10,6 @@ CREATE TABLE users(
     "updatedAt" TIMESTAMP
 );
 
-DROP TABLE users;
-
 select * from users;
 
 INSERT INTO users (username, email, "phoneNumber")
@@ -46,10 +44,6 @@ create table "medicineOrders"(
     "deletedAt" TIMESTAMP,
     "updatedAt" TIMESTAMP
 );
-
-drop table "medicineOrders";
-
-select * from "medicineOrders";
 
 insert into "medicineOrders"
 ("userId", "medicineId", count, "subTotal")
