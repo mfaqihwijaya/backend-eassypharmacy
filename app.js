@@ -9,6 +9,10 @@ const { MedicineService } = require("./src/service/medicine")
 const { connectDb } = require("./src/config/db")
 const { UserController } = require("./src/controller/user");
 const { MedicineController } = require("./src/controller/medicine");
+const { MedicineOrderPostgres } = require("./src/repository/medicineOrder");
+const { MedicineOrderService } = require("./src/service/medicineOrder");
+const { MedicineOrderController } = require("./src/controller/medicineOrder");
+const { MedicineOrderRouter } = require("./src/router/medicineOrder");
 
 
 async function serveBackend() {
@@ -36,19 +40,27 @@ async function prepare() {
 
   // class definitions
   const userRepo = new UserPostgres(dbMaster);
-  const medicineRepo = new MedicinePostgres(dbMaster)
   const userService = new UserService(userRepo);
+  const userController = new UserController(userService);
+
+  const medicineRepo = new MedicinePostgres(dbMaster);
   const medicineService = new MedicineService(medicineRepo);
-  const userController = new UserController(userService)
   const medicineController = new MedicineController(medicineService);
+
+  const medicineOrderRepo = new MedicineOrderPostgres(dbMaster);
+  const medicineOrderService = new MedicineOrderService(medicineOrderRepo);
+  const medicineOrderController = new MedicineOrderController(medicineOrderService);
+
   // router
-  const userRouter = new UserRouter(app, userController)
-  const medicineRouter = new MedicineRouter(app, medicineController)
+  const userRouter = new UserRouter(app, userController);
+  const medicineRouter = new MedicineRouter(app, medicineController);
+  const medicineOrderRouter = new MedicineOrderRouter(app, medicineOrderController);
 
   // mount all 
-  userRouter.mountV1()
-  medicineRouter.mountV1()
-  
+  userRouter.mountV1();
+  medicineRouter.mountV1();
+  medicineOrderRouter.mountV1();
+
   return { app, dbMaster }
 }
 

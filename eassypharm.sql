@@ -38,8 +38,8 @@ create table "medicineOrders"(
     id SERIAL PRIMARY KEY,
     "userId" INTEGER REFERENCES users(id) not null,
     "medicineId" INTEGER REFERENCES medicines(id) not null,
-    count INTEGER,
-    "subTotal" INTEGER,
+    "count" INTEGER,
+    "subTotal" FLOAT,
     "createdAt" TIMESTAMP DEFAULT now(),
     "deletedAt" TIMESTAMP,
     "updatedAt" TIMESTAMP

@@ -6,6 +6,10 @@ const SuccessMessage = {
     "MEDICINE_CREATED": "medicine data successfully created",
     "MEDICINE_FETCHED": "medicine data successfully fetched",
     "MEDICINE_UPDATED": "medicine data succesfully updated",
+
+    "MEDICINE_ORDER_CREATED": "medicine order data successfully created",
+    "MEDICINE_ORDER_FETCHED": "medicine order data successfully fetched",
+    "MEDICINE_ORDER_UPDATED": "medicine order data succesfully updated",
 }
 
 const ErrorMessage = {
@@ -26,6 +30,13 @@ const ErrorMessage = {
     "ERROR_MEDICINE_NOT_FOUND": "error medicine not found in system",
 
     "ERROR_INVALID_MEDICINE_ID": "invalid medicine id",
+
+    "ERROR_MEDICINE_ORDER_CREATION": "error creating medicine order, please try again",
+    "ERROR_MEDICINE_ORDER_UPDATE": "error updating medicine order, please try again",
+    "ERROR_MEDICINE_ORDER_FETCH": "error fetching medicine order data, please try again",
+    "ERROR_MEDICINE_ORDER_NOT_FOUND": "error medicine order not found in system",
+
+    "ERROR_INVALID_MEDICINE_ORDER_ID": "invalid medicine order id",
 }
 
 class SuccessResponse {
