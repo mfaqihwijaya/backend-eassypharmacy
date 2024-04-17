@@ -1,10 +1,14 @@
 const express = require("express");
 const config = require("./config/local.json");
 const { UserPostgres } = require("./src/repository/user")
+const { MedicinePostgres } = require("./src/repository/medicine")
 const { UserRouter } = require("./src/router/user")
+const { MedicineRouter } = require("./src/router/medicine");
 const { UserService } = require("./src/service/user")
+const { MedicineService } = require("./src/service/medicine")
 const { connectDb } = require("./src/config/db")
 const { UserController } = require("./src/controller/user");
+const { MedicineController } = require("./src/controller/medicine");
 
 
 async function serveBackend() {
@@ -32,13 +36,19 @@ async function prepare() {
 
   // class definitions
   const userRepo = new UserPostgres(dbMaster);
+  const medicineRepo = new MedicinePostgres(dbMaster)
   const userService = new UserService(userRepo);
+  const medicineService = new MedicineService(medicineRepo);
   const userController = new UserController(userService)
+  const medicineController = new MedicineController(medicineService);
   // router
   const userRouter = new UserRouter(app, userController)
+  const medicineRouter = new MedicineRouter(app, medicineController)
 
   // mount all 
   userRouter.mountV1()
+  medicineRouter.mountV1()
+  
   return { app, dbMaster }
 }
 

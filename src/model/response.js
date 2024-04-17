@@ -2,6 +2,10 @@ const SuccessMessage = {
     "USER_CREATED": "user data successfully created",
     "USER_FETCHED": "user data successfully fetched",
     "USER_UPDATED": "user data succesfully updated",
+
+    "MEDICINE_CREATED": "medicine data successfully created",
+    "MEDICINE_FETCHED": "medicine data successfully fetched",
+    "MEDICINE_UPDATED": "medicine data succesfully updated",
 }
 
 const ErrorMessage = {
@@ -14,7 +18,14 @@ const ErrorMessage = {
     "ERROR_INVALID_USERNAME": "invalid username",
     "ERROR_INVALID_EMAIL": "invalid email",
     "ERROR_INVALID_USER_ID": "invalid user id",
-    "ERROR_INVALID_PASSWORD": "invalid user password"
+    "ERROR_INVALID_PASSWORD": "invalid user password",
+
+    "ERROR_MEDICINE_CREATION": "error creating medicine, please try again",
+    "ERROR_MEDICINE_UPDATE": "error updating medicine, please try again",
+    "ERROR_MEDICINE_FETCH": "error fetching medicine data, please try again",
+    "ERROR_MEDICINE_NOT_FOUND": "error medicine not found in system",
+
+    "ERROR_INVALID_MEDICINE_ID": "invalid medicine id",
 }
 
 class SuccessResponse {
