@@ -1,4 +1,4 @@
-const { SuccessMessage, ErrorResponse, ErrorMessage, SuccessResponse } = require("../model/response");
+const { SuccessMessage, ErrorResponse, ErrorMessage, SuccessResponse } = require("../models/response");
 
 class MedicineOrderController {
     constructor(medicineOrderService) {

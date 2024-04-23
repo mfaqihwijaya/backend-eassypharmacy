@@ -8,11 +8,8 @@ class MedicineOrderRouter {
         // mount all
         const v1 = "/api/v1"
 
-        // [GET, POST] /api/v1/medicine-orders 
+        // [POST] /api/v1/medicine-orders 
         const medicineOrders = this.app.route(`${v1}/medicine-orders`)
-        medicineOrders.get(async (req, res) => {
-            this.medicineOrderController.getMedicineOrders(req, res)
-        })
         medicineOrders.post(async (req, res) => {
             this.medicineOrderController.createMedicineOrder(req, res)
         })
