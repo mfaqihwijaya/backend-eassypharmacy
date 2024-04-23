@@ -19,7 +19,7 @@ const ErrorMessage = {
     "ERROR_USER_FETCH": "error fetching user data, please try again",
     "ERROR_USER_EMAIL_USED": "error this email is already used",
     "ERROR_USER_USERNAME_USED": "error this username is already used",
-    "ERROR_USER_NOT_FOUND": "error user not found in system",
+    "ERROR_USER_NOT_FOUND": "error user not found in the system",
     "ERROR_USER_LOGIN": "error logging in user, please try again",
 
     "ERROR_INVALID_USERNAME": "invalid username",
