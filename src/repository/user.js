@@ -5,7 +5,7 @@ class UserPostgres {
 
     async createUser(user) {
         try {
-            await User.create({
+            await this.User.create({
                 username: user.username,
                 email: user.email,
                 'phoneNumber': user.phoneNumber,
@@ -18,7 +18,7 @@ class UserPostgres {
 
     async getUserById(userId) {
         try {
-            const user = await User.findOne({ where: { id: userId, deletedAt: null } })
+            const user = await this.User.findOne({ where: { id: userId, deletedAt: null } })
             return user
         } catch (error) {
             throw error

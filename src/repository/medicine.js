@@ -5,7 +5,7 @@ class MedicinePostgres {
 
     async getMedicines() {
         try {
-            const medicines = await Medicine.findAll({
+            const medicines = await this.Medicine.findAll({
                 where: { deletedAt: null }
             })
             return medicines
@@ -16,7 +16,7 @@ class MedicinePostgres {
 
     async getMedicineById(medicineId) {
         try {
-            const medicine = await Medicine.findOne({ where: { id: medicineId, deletedAt: null } })
+            const medicine = await this.Medicine.findOne({ where: { id: medicineId, deletedAt: null } })
             return medicine
         } catch (error) {
             throw error

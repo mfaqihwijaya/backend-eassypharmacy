@@ -1,5 +1,4 @@
 const { SuccessMessage, ErrorResponse, ErrorMessage, SuccessResponse } = require("../model/response");
-const { UserRequest } = require("../model/user");
 
 class UserController {
     constructor(userService) {

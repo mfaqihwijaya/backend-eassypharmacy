@@ -1,5 +1,5 @@
 const express = require("express");
-const config = require("./config/local.json");
+const config = require("./src/config/server.json");
 const { UserPostgres } = require("./src/repository/user")
 const { MedicinePostgres } = require("./src/repository/medicine")
 const { UserRouter } = require("./src/router/user")

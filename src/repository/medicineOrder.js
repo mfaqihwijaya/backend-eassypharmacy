@@ -5,7 +5,7 @@ class MedicineOrderPostgres {
 
     async createMedicineOrder(medicineOrder) {
         try {
-            await MedicineOrder.create({
+            await this.MedicineOrder.create({
                 userId: medicineOrder.userId,
                 medicineId: medicineOrder.medicineId,
                 count: medicineOrder.count,
@@ -18,7 +18,7 @@ class MedicineOrderPostgres {
 
     async getMedicineOrders() {
         try {
-            const medicineOrders = await MedicineOrder.findAll({
+            const medicineOrders = await this.MedicineOrder.findAll({
                 where: { deletedAt: null }
             })
             return medicineOrders
@@ -29,7 +29,7 @@ class MedicineOrderPostgres {
 
     async getMedicineOrderById(medicineOrderId) {
         try {
-            const medicineOrder = await MedicineOrder.findOne({ where: { id: medicineOrderId, deletedAt: null } })
+            const medicineOrder = await this.MedicineOrder.findOne({ where: { id: medicineOrderId, deletedAt: null } })
             return medicineOrder
         } catch (error) {
             throw error
