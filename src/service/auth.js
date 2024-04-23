@@ -30,6 +30,9 @@ class AuthService {
         try {
             // get user by email
             const userData = await this.userRepo.getUserByEmail(user.email)
+            if (!userData) {
+                throw new Error(ErrorMessage.ERROR_USER_NOT_FOUND)
+            }
             // compare password
             const hashedPassword = userData.password
             const plainPassword = user.password
