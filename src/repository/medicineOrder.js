@@ -1,15 +1,6 @@
-const { DataTypes } = require("sequelize")
-const { MedicineOrder } = require("../model/medicineOrder")
 class MedicineOrderPostgres {
-    constructor(sequelize) {
-        MedicineOrder.init({
-            'userId': DataTypes.INTEGER,
-            'medicineId': DataTypes.INTEGER,
-            count: DataTypes.INTEGER,
-            'subTotal': DataTypes.FLOAT,
-            'deletedAt': DataTypes.DATE,
-            'updatedAt': DataTypes.DATE,
-        }, { sequelize, modelName: 'medicineOrder', tableName: "medicineOrders" })
+    constructor(db) {
+        this.MedicineOrder = db.MedicineOrder;
     }
 
     async createMedicineOrder(medicineOrder) {

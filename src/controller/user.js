@@ -8,16 +8,8 @@ class UserController {
 
     async createUser(req, res) {
         let payload = req.body
-        payload = Object.assign(new UserRequest, payload)
+        // TODO bcrypt password
 
-        // validate payload
-        try {
-            payload.validate()
-        } catch (error) {
-            console.error(`error validating payload ${error.message}`)
-            const errs = [new ErrorResponse(error.message, ErrorMessage.ERROR_USER_CREATION)]
-            res.status(400).send(errs)
-        }
         // call repository
         try {
             await this.userService.createUser(payload)
@@ -30,25 +22,8 @@ class UserController {
         }
     }
 
-    async getUsers(req, res) {
-        try {
-            const users = await this.userService.getUsers()
-            const response = new SuccessResponse(SuccessMessage.USER_FETCHED, users)
-            res.status(200).send(response)
-        } catch (error) {
-            console.error(`error fetching user ${error.message}`)
-            const errs = [new ErrorResponse(error.message, ErrorMessage.ERROR_USER_FETCH)]
-            res.status(500).send(errs)
-        }
-    }
-
     async getUserById(req, res) {
         const userId = req.params.userId
-        if (userId <= 0) {
-            const errs = [new ErrorResponse(ErrorMessage.ERROR_INVALID_USER_ID, ErrorMessage.ERROR_USER_FETCH)]
-            res.status(400).send(errs)
-            return
-        }
 
         try {
             const user = await this.userService.getUserById(userId)
@@ -62,35 +37,6 @@ class UserController {
         } catch (error) {
             console.error(`error fetching user ${error.message}`)
             const errs = [new ErrorResponse(error.message, ErrorMessage.ERROR_USER_FETCH)]
-            res.status(500).send(errs)
-        }
-    }
-
-    async updateUserDob(req, res) {
-        const userId = req.params.userId
-        if (userId <= 0) {
-            const errs = [new ErrorResponse(ErrorMessage.ERROR_INVALID_USER_ID, ErrorMessage.ERROR_USER_FETCH)]
-            res.status(400).send(errs)
-            return
-        }
-
-        const user = Object.assign(new UserRequest, req.body)
-        try {
-            user.validateDOB()
-        } catch (error) {
-            console.error(`error validating payload ${error.message}`)
-            const errs = [new ErrorResponse(error.message, ErrorMessage.ERROR_USER_UPDATE)]
-            res.status(400).send(errs)
-        }
-        user.id = userId
-
-        try {
-            await this.userService.updateUserDob(user)
-            const response = new SuccessResponse(SuccessMessage.USER_UPDATED)
-            res.status(200).send(response)
-        } catch (error) {
-            console.error(`error fetching user ${error.message}`)
-            const errs = [new ErrorResponse(error.message, ErrorMessage.ERROR_USER_UPDATE)]
             res.status(500).send(errs)
         }
     }

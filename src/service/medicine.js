@@ -3,14 +3,6 @@ class MedicineService {
         this.medicineRepo = medicineRepo
     }
 
-    async createMedicine(medicine) {
-        try {
-            await this.medicineRepo.createMedicine(medicine);
-        } catch (error) {
-            throw error;
-        }
-    }
-
     async getMedicines() {
         try {
             const medicines = await this.medicineRepo.getMedicines();

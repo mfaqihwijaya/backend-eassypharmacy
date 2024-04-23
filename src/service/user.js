@@ -11,15 +11,6 @@ class UserService {
         }
     }
 
-    async getUsers() {
-        try {
-            const users = await this.userRepo.getUsers()
-            return users
-        } catch (error) {
-            throw error
-        }
-    }
-
     async getUserById(userId) {
         try {
             const user = await this.userRepo.getUserById(userId)

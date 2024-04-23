@@ -1,30 +1,6 @@
-const { DataTypes } = require("sequelize")
-const { Medicine } = require("../model/medicine")
 class MedicinePostgres {
-    constructor(sequelize) {
-        Medicine.init({
-            name: DataTypes.STRING,
-            description: DataTypes.STRING,
-            price: DataTypes.FLOAT,
-            stock: DataTypes.INTEGER,
-            image: DataTypes.STRING,
-            'deletedAt': DataTypes.DATE,
-            'updatedAt': DataTypes.DATE,
-        }, { sequelize, modelName: 'medicine', tableName: "medicines" })
-    }
-
-    async createMedicine(medicine) {
-        try {
-            await Medicine.create({
-                name: medicine.name,
-                description: medicine.description,
-                price: medicine.price,
-                stock: medicine.stock,
-                image: medicine.image,
-            })
-        } catch (error) {
-            throw error;
-        }
+    constructor(db) {
+        this.Medicine = db.Medicine
     }
 
     async getMedicines() {

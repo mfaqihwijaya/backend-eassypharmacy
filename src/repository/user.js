@@ -1,14 +1,6 @@
-const { User } = require("../model/user")
-const { DataTypes } = require("sequelize")
-
 class UserPostgres {
-    constructor(sequelize) {
-        User.init({
-            username: DataTypes.STRING,
-            email: DataTypes.STRING,
-            'phoneNumber': DataTypes.STRING,
-            password: DataTypes.STRING,
-        }, { sequelize, modelName: 'user', tableName: "users" })
+    constructor(db) {
+        this.User = db.User;
     }
 
     async createUser(user) {
@@ -19,17 +11,6 @@ class UserPostgres {
                 'phoneNumber': user.phoneNumber,
                 password: user.password,
             })
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    async getUsers() {
-        try {
-            const users = await User.findAll({
-                where: { deletedAt: null }
-            })
-            return users
         } catch (error) {
             throw error;
         }

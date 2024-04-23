@@ -19,26 +19,8 @@ class MedicineOrderController {
         }
     }
 
-    async getMedicineOrders(req, res) {
-        try {
-            const medicineOrders = await this.medicineOrderService.getMedicineOrders()
-            const response = new SuccessResponse(SuccessMessage.MEDICINE_ORDER_FETCHED, medicineOrders)
-            res.status(200).send(response)
-        } catch (error) {
-            console.error(`error fetching medicine order ${error.message}`)
-            const errs = [new ErrorResponse(error.message, ErrorMessage.ERROR_MEDICINE_ORDER_FETCH)]
-            res.status(500).send(errs)
-        }
-    }
-
     async getMedicineOrderById(req, res) {
         const medicineOrderId = req.params.medicineOrderId
-        if (medicineOrderId <= 0) {
-            const errs = [new ErrorResponse(ErrorMessage.ERROR_INVALID_MEDICINE_ORDER_ID, ErrorMessage.ERROR_MEDICINE_ORDER_FETCH)]
-            res.status(400).send(errs)
-            return
-        }
-
         try {
             const medicineOrder = await this.medicineOrderService.getMedicineOrderById(medicineOrderId)
             if (!medicineOrder) {
