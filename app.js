@@ -1,18 +1,21 @@
 const express = require("express");
-const config = require("./src/config/server.json");
-const { UserPostgres } = require("./src/repository/user")
-const { MedicinePostgres } = require("./src/repository/medicine")
+const config = require("./src/config/config.json");
+const { UserPostgres } = require("./src/repositories/user")
+const { MedicinePostgres } = require("./src/repositories/medicine")
 const { UserRouter } = require("./src/router/user")
 const { MedicineRouter } = require("./src/router/medicine");
 const { UserService } = require("./src/service/user")
 const { MedicineService } = require("./src/service/medicine")
-const db = require("./src/models")
+const db = require("./src/models/db")
 const { UserController } = require("./src/controller/user");
 const { MedicineController } = require("./src/controller/medicine");
-const { MedicineOrderPostgres } = require("./src/repository/medicineOrder");
+const { MedicineOrderPostgres } = require("./src/repositories/medicineOrder");
 const { MedicineOrderService } = require("./src/service/medicineOrder");
 const { MedicineOrderController } = require("./src/controller/medicineOrder");
 const { MedicineOrderRouter } = require("./src/router/medicineOrder");
+const { AuthService } = require("./src/service/auth");
+const { AuthController } = require("./src/controller/auth");
+const { AuthRouter } = require("./src/router/auth");
 
 
 async function serveBackend() {
@@ -37,6 +40,10 @@ async function prepare() {
 
   // class definitions
   const userRepo = new UserPostgres(db);
+
+  const authService = new AuthService(userRepo, config.session);
+  const authController = new AuthController(authService);
+
   const userService = new UserService(userRepo);
   const userController = new UserController(userService);
 
@@ -49,11 +56,13 @@ async function prepare() {
   const medicineOrderController = new MedicineOrderController(medicineOrderService);
 
   // router
+  const authRouter = new AuthRouter(app, authController);
   const userRouter = new UserRouter(app, userController);
   const medicineRouter = new MedicineRouter(app, medicineController);
   const medicineOrderRouter = new MedicineOrderRouter(app, medicineOrderController);
 
   // mount all 
+  authRouter.mountV1();
   userRouter.mountV1();
   medicineRouter.mountV1();
   medicineOrderRouter.mountV1();

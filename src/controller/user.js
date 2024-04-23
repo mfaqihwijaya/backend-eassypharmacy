@@ -1,26 +1,9 @@
-const { SuccessMessage, ErrorResponse, ErrorMessage, SuccessResponse } = require("../model/response");
+const { SuccessMessage, ErrorResponse, ErrorMessage, SuccessResponse } = require("../models/response");
 
 class UserController {
     constructor(userService) {
         this.userService = userService
     }
-
-    async createUser(req, res) {
-        let payload = req.body
-        // TODO bcrypt password
-
-        // call repository
-        try {
-            await this.userService.createUser(payload)
-            const response = new SuccessResponse(SuccessMessage.USER_CREATED)
-            res.status(201).send(response)
-        } catch (error) {
-            console.error(`error creating user ${error.message}`)
-            const errs = [new ErrorResponse(error.message, ErrorMessage.ERROR_USER_CREATION)]
-            res.status(500).send(errs)
-        }
-    }
-
     async getUserById(req, res) {
         const userId = req.params.userId
 
