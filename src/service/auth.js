@@ -1,7 +1,6 @@
 const { ErrorMessage } = require('../models/response')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const { Claims, ClaimsData } = require('../models/claims')
 const Token = require('../models/token')
 class AuthService {
     constructor(userRepo, sessionConfig) {
@@ -65,40 +64,17 @@ class AuthService {
     }
     async createUserToken(userData) {
         // membuat claim
-        // sub, iss, iat, exp, aud, data
+        // sub, iat,
         const now = new Date()
-        const exp = (Date.now() / 1000) + (60 * 60 * this.sessionConfig.accessExpires)
-        const claims = new Claims(
-            userData.id,
-            this.sessionConfig.issuer,
-            now,
-            exp,
-            this.sessionConfig.audience,
-            new ClaimsData (
-                userData.email,
-                userData.username
-            )
-        )
+        const claims = {
+            sub: userData.id,
+        }
 
-        const expRefresh = (Date.now() / 1000) + (60 * 60 * this.sessionConfig.refreshExpires)
-        const refreshClaims = new Claims(
-            userData.id,
-            this.sessionConfig.issuer,
-            now,
-            expRefresh,
-            this.sessionConfig.audience,
-            new ClaimsData (
-                userData.email,
-                userData.username
-            )
-        )
-
-        // membuat jwt accessToken dan refreshToken
-        const accessToken = jwt.sign(JSON.stringify(claims), this.sessionConfig.secret)
-        const refreshToken = jwt.sign(JSON.stringify(refreshClaims), this.sessionConfig.secret)
+        // membuat jwt accessToken
+        const accessToken = jwt.sign(claims, this.sessionConfig.secret)
 
         // generate token model
-        const tokens = new Token(accessToken, refreshToken)
+        const tokens = new Token(accessToken)
         return tokens
     }
 }

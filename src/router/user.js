@@ -1,3 +1,4 @@
+const { validateJWT } = require('../middlewares/jwt')
 class UserRouter {
     constructor(app, userController) {
         this.userController = userController
@@ -10,13 +11,13 @@ class UserRouter {
 
         // [POST] /api/v1/users 
         const users = this.app.route(`${v1}/users`)
-        users.post(async (req, res) => {
+        users.post(validateJWT,async (req, res) => {
             this.userController.createUser(req, res)
         })
 
         // [GET] /api/v1/users/:userId
         const userId = this.app.route(`${v1}/users/:userId`)
-        userId.get(async (req, res) => {
+        userId.get(validateJWT, async (req, res) => {
             this.userController.getUserById(req, res)
         })
 
