@@ -1,3 +1,5 @@
+const { validateJWT } = require('../middlewares/jwt')
+
 class MedicineRouter {
     constructor(app, medicineController) {
         this.medicineController = medicineController
@@ -10,13 +12,13 @@ class MedicineRouter {
 
         // [GET] /api/v1/medicines 
         const medicines = this.app.route(`${v1}/medicines`)
-        medicines.get(async (req, res) => {
+        medicines.get(validateJWT, async (req, res) => {
             this.medicineController.getMedicines(req, res)
         })
 
         // [GET] /api/v1/medicines/:medicineId
         const medicineId = this.app.route(`${v1}/medicines/:medicineId`)
-        medicineId.get(async (req, res) => {
+        medicineId.get(validateJWT, async (req, res) => {
             this.medicineController.getMedicineById(req, res)
         })
 

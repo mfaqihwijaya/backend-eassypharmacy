@@ -21,12 +21,13 @@ const ErrorMessage = {
     "ERROR_USER_USERNAME_USED": "error this username is already used",
     "ERROR_USER_NOT_FOUND": "error user not found in the system",
     "ERROR_USER_LOGIN": "error logging in user, please try again",
+    "ERROR_USER_AUTHORIZATION": "error authorizing user, please try again",
 
     "ERROR_INVALID_USERNAME": "invalid username",
     "ERROR_INVALID_EMAIL": "invalid email",
     "ERROR_INVALID_USER_ID": "invalid user id",
     "ERROR_INVALID_PASSWORD": "invalid user password",
-    "ERROR_INVALID_ACCESS_TOKEN": "invalid access token",
+    "ERROR_REQUIRED_ACCESS_TOKEN": "access token required",
 
     "ERROR_MEDICINE_CREATION": "error creating medicine, please try again",
     "ERROR_MEDICINE_UPDATE": "error updating medicine, please try again",

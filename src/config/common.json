@@ -4,10 +4,6 @@
     "port": 3000
   },
   "session": {
-    "secret": "thisisverysupersecretkey",
-    "audience": ["eassypharmacy.com"],
-    "issuer": ["eassypharmacy.com"],
-    "accessExpires": 1,
-    "refreshExpires": 2
+    "secret": "thisisverysupersecretkey"
   }
 }

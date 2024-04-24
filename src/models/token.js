@@ -1,7 +1,6 @@
 class Token {
-    constructor(accessToken, refreshToken) {
+    constructor(accessToken) {
         this.accessToken = accessToken
-        this.refreshToken = refreshToken
     }   
 }
 
