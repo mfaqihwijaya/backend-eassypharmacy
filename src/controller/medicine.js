@@ -1,4 +1,4 @@
-const { SuccessMessage, ErrorResponse, ErrorMessage, SuccessResponse, Error } = require("../models/response");
+const { SuccessMessage, ErrorResponse, ErrorMessage, SuccessResponse, ErrorType } = require("../models/response");
 
 class MedicineController {
     constructor(medicineService) {
@@ -10,7 +10,7 @@ class MedicineController {
             const response = new SuccessResponse(SuccessMessage.MEDICINE_FETCHED, medicines)
             res.status(200).send(response)
         } catch (error) {
-            const errs = [new ErrorResponse(Error.ERROR_MEDICINE_FETCH, error.message)]
+            const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_FETCH, error.message)]
             res.status(500).send(errs)
         }
     }
@@ -27,7 +27,7 @@ class MedicineController {
             const response = new SuccessResponse(SuccessMessage.MEDICINE_FETCHED, medicine)
             res.status(200).send(response)
         } catch (error) {
-            const errs = [new ErrorResponse(Error.ERROR_MEDICINE_FETCH, error.message)]
+            const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_FETCH, error.message)]
             res.status(500).send(errs)
         }
     }

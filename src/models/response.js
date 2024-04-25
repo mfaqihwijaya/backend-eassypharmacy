@@ -12,8 +12,10 @@ const SuccessMessage = {
     "MEDICINE_ORDER_UPDATED": "medicine order data succesfully updated",
 }
 
-const Error = {
+const ErrorType = {
     "ERROR_MEDICINE_FETCH": "error fetching medicine data",
+    "ERROR_MEDICINE_ORDER_CREATION": "error creating medicine order",
+    "ERROR_USER_AUTHENTICATION": "error authenticating user",
 }
 
 const ErrorMessage = {
@@ -37,7 +39,6 @@ const ErrorMessage = {
     "ERROR_MEDICINE_NOT_FOUND": "medicine not found in the system",
     "ERROR_MEDICINE_INVALID_ID": "invalid medicine id",
 
-    "ERROR_MEDICINE_ORDER_CREATION": "error creating medicine order, please try again",
     "ERROR_MEDICINE_ORDER_UPDATE": "error updating medicine order, please try again",
     "ERROR_MEDICINE_ORDER_FETCH": "error fetching medicine order data, please try again",
     "ERROR_MEDICINE_ORDER_NOT_FOUND": "error medicine order not found in system",
@@ -59,4 +60,4 @@ class ErrorResponse {
     }
 }
 
-module.exports = { SuccessResponse, ErrorResponse, SuccessMessage, ErrorMessage, Error }
+module.exports = { SuccessResponse, ErrorResponse, SuccessMessage, ErrorMessage, ErrorType }
