@@ -1,6 +1,7 @@
 class UserPostgres {
     constructor(db) {
         this.User = db.User;
+        console.log('user repository created');
     }
 
     async createUser(user) {

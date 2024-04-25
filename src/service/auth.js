@@ -77,6 +77,19 @@ class AuthService {
         const tokens = new Token(accessToken)
         return tokens
     }
+    async validateUserToken(token) {
+        try {
+            const decoded = jwt.verify(token, this.sessionConfig.secret);
+            const { sub } = decoded;
+            const user = await this.userRepo.getUserById(sub)
+            if(!user) {
+                throw new Error(ErrorMessage.ERROR_INVALID_ACCESS_TOKEN);
+            }
+            return decoded
+        } catch (err) {
+            throw err
+        }
+    }
 }
 
 module.exports = { AuthService }

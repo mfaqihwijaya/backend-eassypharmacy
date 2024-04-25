@@ -16,6 +16,7 @@ const { MedicineOrderRouter } = require("./src/router/medicineOrder");
 const { AuthService } = require("./src/service/auth");
 const { AuthController } = require("./src/controller/auth");
 const { AuthRouter } = require("./src/router/auth");
+const { AuthMiddleware } = require("./src/middlewares/auth");
 
 
 async function serveBackend() {
@@ -55,12 +56,15 @@ async function prepare() {
   const medicineOrderService = new MedicineOrderService(medicineOrderRepo);
   const medicineOrderController = new MedicineOrderController(medicineOrderService);
 
+  // middleware
+  const authMiddleware = new AuthMiddleware(authService);
+  
   // router
   const authRouter = new AuthRouter(app, authController);
-  const userRouter = new UserRouter(app, userController);
-  const medicineRouter = new MedicineRouter(app, medicineController);
-  const medicineOrderRouter = new MedicineOrderRouter(app, medicineOrderController);
-
+  const userRouter = new UserRouter(app, authMiddleware, userController);
+  const medicineRouter = new MedicineRouter(app, authMiddleware, medicineController);
+  const medicineOrderRouter = new MedicineOrderRouter(app, authMiddleware, medicineOrderController);
+  
   // mount all 
   authRouter.mountV1();
   userRouter.mountV1();
