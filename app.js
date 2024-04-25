@@ -61,12 +61,15 @@ async function prepare() {
   
   // router
   const authRouter = new AuthRouter(app, authController);
-  const userRouter = new UserRouter(app, authMiddleware, userController);
-  const medicineRouter = new MedicineRouter(app, authMiddleware, medicineController);
-  const medicineOrderRouter = new MedicineOrderRouter(app, authMiddleware, medicineOrderController);
+  const userRouter = new UserRouter(app, userController);
+  const medicineRouter = new MedicineRouter(app, medicineController);
+  const medicineOrderRouter = new MedicineOrderRouter(app, medicineOrderController);
   
   // mount all 
   authRouter.mountV1();
+  app.use(async (req, res, next) => {
+    authMiddleware.authenticate(req, res, next);
+  })
   userRouter.mountV1();
   medicineRouter.mountV1();
   medicineOrderRouter.mountV1();
