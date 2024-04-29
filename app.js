@@ -35,6 +35,13 @@ async function prepare() {
   // middleware
   app.use(express.json());
 
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*'); // Atur domain dengan benar jika tidak ingin menggunakan wildcard '*'
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+  });
+
   // class definitions
   const userRepo = new UserPostgres(db);
   const userService = new UserService(userRepo);
