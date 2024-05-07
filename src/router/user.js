@@ -1,7 +1,6 @@
 class UserRouter {
-    constructor(app, authMiddleware, userController) {
+    constructor(app, userController) {
         this.userController = userController
-        this.authMiddleware = authMiddleware
         this.app = app
     }
 
@@ -11,11 +10,7 @@ class UserRouter {
 
         // [GET] /api/v1/users/:userId
         const userId = this.app.route(`${v1}/users/:userId`)
-        userId.get(
-        async (req, res, next) => {
-            this.authMiddleware.authenticate(req, res, next)
-        }, 
-        async (req, res) => {
+        userId.get(async (req, res) => {
             this.userController.getUserById(req, res)
         })
 

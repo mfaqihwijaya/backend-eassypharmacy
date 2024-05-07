@@ -12,6 +12,12 @@ const SuccessMessage = {
     "MEDICINE_ORDER_UPDATED": "medicine order data succesfully updated",
 }
 
+const ErrorType = {
+    "ERROR_MEDICINE_FETCH": "error fetching medicine data",
+    "ERROR_MEDICINE_ORDER_CREATION": "error creating medicine order",
+    "ERROR_USER_AUTHENTICATION": "error authenticating user",
+}
+
 const ErrorMessage = {
 
     "ERROR_USER_REGISTER": "error creating user, please try again",
@@ -29,15 +35,10 @@ const ErrorMessage = {
     "ERROR_INVALID_PASSWORD": "invalid user password",
     "ERROR_INVALID_ACCESS_TOKEN": "invalid access token",
     "ERROR_REQUIRED_ACCESS_TOKEN": "access token required",
+    
+    "ERROR_MEDICINE_NOT_FOUND": "medicine not found in the system",
+    "ERROR_MEDICINE_INVALID_ID": "invalid medicine id",
 
-    "ERROR_MEDICINE_CREATION": "error creating medicine, please try again",
-    "ERROR_MEDICINE_UPDATE": "error updating medicine, please try again",
-    "ERROR_MEDICINE_FETCH": "error fetching medicine data, please try again",
-    "ERROR_MEDICINE_NOT_FOUND": "error medicine not found in system",
-
-    "ERROR_INVALID_MEDICINE_ID": "invalid medicine id",
-
-    "ERROR_MEDICINE_ORDER_CREATION": "error creating medicine order, please try again",
     "ERROR_MEDICINE_ORDER_UPDATE": "error updating medicine order, please try again",
     "ERROR_MEDICINE_ORDER_FETCH": "error fetching medicine order data, please try again",
     "ERROR_MEDICINE_ORDER_NOT_FOUND": "error medicine order not found in system",
@@ -52,8 +53,6 @@ class SuccessResponse {
     }
 }
 
-console.log('response model created');
-
 class ErrorResponse {
     constructor(error, message) {
         this.error = error
@@ -61,4 +60,4 @@ class ErrorResponse {
     }
 }
 
-module.exports = { SuccessResponse, ErrorResponse, SuccessMessage, ErrorMessage }
+module.exports = { SuccessResponse, ErrorResponse, SuccessMessage, ErrorMessage, ErrorType }
