@@ -1,5 +1,6 @@
 const express = require("express");
 const config = require("./src/config/common.json");
+const cors = require("cors");
 const { UserPostgres } = require("./src/repositories/user")
 const { MedicinePostgres } = require("./src/repositories/medicine")
 const { UserRouter } = require("./src/router/user")
@@ -38,6 +39,7 @@ async function prepare() {
   const app = express();
   // middleware
   app.use(express.json());
+  app.use(cors());
 
   // class definitions
   const userRepo = new UserPostgres(db);
