@@ -1,4 +1,4 @@
-const { SuccessMessage, ErrorResponse, ErrorMessage, SuccessResponse } = require("../models/response");
+const { SuccessMessage, ErrorResponse, ErrorMessage, SuccessResponse, ErrorType } = require("../models/response");
 
 class MedicineController {
     constructor(medicineService) {
@@ -6,12 +6,12 @@ class MedicineController {
     }
     async getMedicines(req, res) {
         try {
-            const medicines = await this.medicineService.getMedicines()
+            const query = req.query
+            const medicines = await this.medicineService.getMedicines(query)
             const response = new SuccessResponse(SuccessMessage.MEDICINE_FETCHED, medicines)
             res.status(200).send(response)
         } catch (error) {
-            console.error(`error fetching medicine ${error.message}`)
-            const errs = [new ErrorResponse(error.message, ErrorMessage.ERROR_MEDICINE_FETCH)]
+            const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_FETCH, error.message)]
             res.status(500).send(errs)
         }
     }
@@ -21,15 +21,14 @@ class MedicineController {
         try {
             const medicine = await this.medicineService.getMedicineById(medicineId)
             if (!medicine) {
-                const errs = [new ErrorResponse(ErrorMessage.ERROR_MEDICINE_NOT_FOUND, ErrorMessage.ERROR_MEDICINE_FETCH)]
+                const errs = [new ErrorResponse(Error.ERROR_MEDICINE_FETCH, ErrorMessage.ERROR_MEDICINE_NOT_FOUND)]
                 res.status(404).send(errs)
                 return
             }
             const response = new SuccessResponse(SuccessMessage.MEDICINE_FETCHED, medicine)
             res.status(200).send(response)
         } catch (error) {
-            console.error(`error fetching medicine ${error.message}`)
-            const errs = [new ErrorResponse(error.message, ErrorMessage.ERROR_MEDICINE_FETCH)]
+            const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_FETCH, error.message)]
             res.status(500).send(errs)
         }
     }

@@ -1,5 +1,6 @@
 const express = require("express");
 const config = require("./src/config/common.json");
+const cors = require("cors");
 const { UserPostgres } = require("./src/repositories/user")
 const { MedicinePostgres } = require("./src/repositories/medicine")
 const { UserRouter } = require("./src/router/user")
@@ -38,6 +39,7 @@ async function prepare() {
   const app = express();
   // middleware
   app.use(express.json());
+  app.use(cors());
 
   // class definitions
   const userRepo = new UserPostgres(db);
@@ -61,12 +63,15 @@ async function prepare() {
   
   // router
   const authRouter = new AuthRouter(app, authController);
-  const userRouter = new UserRouter(app, authMiddleware, userController);
-  const medicineRouter = new MedicineRouter(app, authMiddleware, medicineController);
-  const medicineOrderRouter = new MedicineOrderRouter(app, authMiddleware, medicineOrderController);
+  const userRouter = new UserRouter(app, userController);
+  const medicineRouter = new MedicineRouter(app, medicineController);
+  const medicineOrderRouter = new MedicineOrderRouter(app, medicineOrderController);
   
   // mount all 
   authRouter.mountV1();
+  app.use(async (req, res, next) => {
+    authMiddleware.authenticate(req, res, next);
+  })
   userRouter.mountV1();
   medicineRouter.mountV1();
   medicineOrderRouter.mountV1();

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config/common');
-const { ErrorResponse, ErrorMessage } = require('../models/response');
+const { ErrorResponse, ErrorMessage, ErrorType } = require('../models/response');
 
 class AuthMiddleware {
     constructor(authService) {
@@ -17,8 +17,8 @@ class AuthMiddleware {
             req.userId = decoded.sub;
             next();
         } catch (err) {
-            const errs = [new ErrorResponse(err.message, ErrorMessage.ERROR_USER_AUTHENTICATION)]
-            return res.status(401).send(errs);
+            const errs = [new ErrorResponse(ErrorType.ERROR_USER_AUTHENTICATION, err.message)]
+            return res.status(403).send(errs);
         }
     }
 }

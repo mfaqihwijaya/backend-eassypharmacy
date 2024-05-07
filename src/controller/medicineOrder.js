@@ -1,4 +1,4 @@
-const { SuccessMessage, ErrorResponse, ErrorMessage, SuccessResponse } = require("../models/response");
+const { SuccessMessage, ErrorResponse, ErrorMessage, SuccessResponse, ErrorType } = require("../models/response");
 
 class MedicineOrderController {
     constructor(medicineOrderService) {
@@ -10,11 +10,10 @@ class MedicineOrderController {
         // call repository
         try {
             await this.medicineOrderService.createMedicineOrder(payload)
-            const response = new SuccessResponse(SuccessMessage.MEDICINE_ORDER_CREATED)
+            const response = new SuccessResponse(SuccessMessage.MEDICINE_ORDER_CREATED, payload)
             res.status(201).send(response)
         } catch (error) {
-            console.error(`error creating medicine order ${error.message}`)
-            const errs = [new ErrorResponse(error.message, ErrorMessage.ERROR_MEDICINE_ORDER_CREATION)]
+            const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_ORDER_CREATION, error.message)]
             res.status(500).send(errs)
         }
     }
@@ -31,7 +30,6 @@ class MedicineOrderController {
             const response = new SuccessResponse(SuccessMessage.MEDICINE_ORDER_FETCHED, medicineOrder)
             res.status(200).send(response)
         } catch (error) {
-            console.error(`error fetching medicine order ${error.message}`)
             const errs = [new ErrorResponse(error.message, ErrorMessage.ERROR_MEDICINE_ORDER_FETCH)]
             res.status(500).send(errs)
         }
