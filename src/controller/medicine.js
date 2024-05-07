@@ -6,7 +6,8 @@ class MedicineController {
     }
     async getMedicines(req, res) {
         try {
-            const medicines = await this.medicineService.getMedicines()
+            const query = req.query
+            const medicines = await this.medicineService.getMedicines(query)
             const response = new SuccessResponse(SuccessMessage.MEDICINE_FETCHED, medicines)
             res.status(200).send(response)
         } catch (error) {
