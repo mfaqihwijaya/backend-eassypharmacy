@@ -1,8 +1,8 @@
 class UserRouter {
-    constructor(app, userController, authMiddleware) {
+    constructor(app, userController, jwtMiddleware) {
         this.userController = userController
         this.app = app
-        this.authMiddleware = authMiddleware
+        this.jwtMiddleware = jwtMiddleware
     }
 
     mountV1() {
@@ -13,7 +13,7 @@ class UserRouter {
         const userId = this.app.route(`${v1}/users/:userId`)
         userId.get(
             async (req, res, next) => {
-                this.authMiddleware.authenticate(req, res, next);
+                this.jwtMiddleware.authenticate(req, res, next);
             },
             async (req, res) => {
                 this.userController.getUserById(req, res)

@@ -1,8 +1,8 @@
 class MedicineOrderRouter {
-    constructor(app, medicineOrderController, authMiddleware) {
+    constructor(app, medicineOrderController, jwtMiddleware) {
         this.medicineOrderController = medicineOrderController
         this.app = app
-        this.authMiddleware = authMiddleware
+        this.jwtMiddleware = jwtMiddleware
     }
 
     mountV1() {
@@ -13,7 +13,7 @@ class MedicineOrderRouter {
         const medicineOrders = this.app.route(`${v1}/medicine-orders`)
         medicineOrders.post(
             async (req, res, next) => {
-                this.authMiddleware.authenticate(req, res, next);
+                this.jwtMiddleware.authenticate(req, res, next);
             },
             async (req, res) => {
                 this.medicineOrderController.createMedicineOrder(req, res)
@@ -24,7 +24,7 @@ class MedicineOrderRouter {
         const medicineOrderId = this.app.route(`${v1}/medicine-orders/:medicineOrderId`)
         medicineOrderId.get(
             async (req, res, next) => {
-                this.authMiddleware.authenticate(req, res, next);
+                this.jwtMiddleware.authenticate(req, res, next);
             },
             async (req, res) => {
                 this.medicineOrderController.getMedicineOrderById(req, res)

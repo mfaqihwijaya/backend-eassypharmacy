@@ -17,6 +17,7 @@ const { MedicineOrderRouter } = require("./src/router/medicineOrder");
 const { AuthService } = require("./src/service/auth");
 const { AuthController } = require("./src/controller/auth");
 const { AuthRouter } = require("./src/router/auth");
+const { JWTMiddleware } = require("./src/middlewares/jwt");
 const { AuthMiddleware } = require("./src/middlewares/auth");
 
 
@@ -59,13 +60,14 @@ async function prepare() {
   const medicineOrderController = new MedicineOrderController(medicineOrderService);
 
   // middleware
-  const authMiddleware = new AuthMiddleware(authService);
+  const jwtMiddleware = new JWTMiddleware(authService);
+  const authMiddleware = new AuthMiddleware();
   
   // router
-  const authRouter = new AuthRouter(app, authController);
-  const userRouter = new UserRouter(app, userController, authMiddleware);
+  const authRouter = new AuthRouter(app, authMiddleware, authController);
+  const userRouter = new UserRouter(app, userController, jwtMiddleware);
   const medicineRouter = new MedicineRouter(app, medicineController);
-  const medicineOrderRouter = new MedicineOrderRouter(app, medicineOrderController, authMiddleware);
+  const medicineOrderRouter = new MedicineOrderRouter(app, medicineOrderController, jwtMiddleware);
   
   // mount all 
   authRouter.mountV1();
