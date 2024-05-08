@@ -1,3 +1,5 @@
+const { Sequelize } = require("../models/db")
+
 class MedicineService {
     constructor(medicineRepo) {
         this.medicineRepo = medicineRepo
@@ -5,11 +7,16 @@ class MedicineService {
 
     async getMedicines(query) {
         try {
-            const { count = 2, page = 1, column = 'name' } = query
+            const { keyword = '', count = 2, page = 1, column = 'name' } = query
+            const whereSearch = {
+                name: {
+                    [Sequelize.Op.like]: `%${keyword}%`
+                }
+            }
             const limit = count
             const offset = count * (page - 1)
             const order = [[column, 'ASC']]
-            const medicines = await this.medicineRepo.getMedicines(limit, offset, order);
+            const medicines = await this.medicineRepo.getMedicines(whereSearch, limit, offset, order);
             return medicines;
         } catch (error) {
             throw error;

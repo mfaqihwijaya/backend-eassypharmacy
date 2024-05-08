@@ -6,10 +6,7 @@ class MedicineOrderPostgres {
     async createMedicineOrder(medicineOrder) {
         try {
             await this.MedicineOrder.create({
-                userId: medicineOrder.userId,
-                medicineId: medicineOrder.medicineId,
-                count: medicineOrder.count,
-                subTotal: medicineOrder.subTotal,
+                medicineOrder
             })
         } catch (error) {
             throw error;

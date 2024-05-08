@@ -1,5 +1,6 @@
 class AuthRouter {
-    constructor(app, authController) {
+    constructor(app, authMiddleware, authController) {
+        this.authMiddleware = authMiddleware
         this.authController = authController
         this.app = app
     }
@@ -10,15 +11,25 @@ class AuthRouter {
 
         // [POST] /api/v1/auth/register
         const register = this.app.route(`${v1}/auth/register`)
-        register.post(async (req, res) => {
-            this.authController.userRegister(req, res)
-        })
+        register.post(
+            async (req, res, next) => {
+                this.authMiddleware.validateRegisterParams(req, res, next);
+            },
+            async (req, res) => {
+                this.authController.userRegister(req, res)
+            }
+        )
 
         // [POST] /api/v1/auth/login
         const login = this.app.route(`${v1}/auth/login`)
-        login.post(async (req, res) => {
-            this.authController.userLogin(req, res)
-        })
+        login.post(
+            async (req, res, next) => {
+                this.authMiddleware.validateLoginParams(req, res, next);
+            },
+            async (req, res) => {
+                this.authController.userLogin(req, res)
+            }
+        )
     }
 }
 

@@ -1,25 +1,34 @@
-const jwt = require('jsonwebtoken');
-const config = require('../config/common');
-const { ErrorResponse, ErrorMessage, ErrorType } = require('../models/response');
+const Joi = require("joi");
+const { ErrorResponse, ErrorMessage } = require("../models/response");
 
 class AuthMiddleware {
-    constructor(authService) {
-        this.authService = authService;
-    }
-    async authenticate(req, res, next) {
-        try {
-            const token = req.headers.authorization?.split(' ')[1];
-            if (!token) {
-                throw new Error(ErrorMessage.ERROR_REQUIRED_ACCESS_TOKEN);
-            }
-            // TODO need to change secret to env
-            const decoded = this.authService.validateUserToken(token);
-            req.userId = decoded.sub;
-            next();
-        } catch (err) {
-            const errs = [new ErrorResponse(ErrorType.ERROR_USER_AUTHENTICATION, err.message)]
-            return res.status(403).send(errs);
+    constructor() {}
+    validateLoginParams(req, res, next) {
+        const schema = Joi.object({
+            email: Joi.string().email().required(),
+            password: Joi.string().min(5).required(),
+        })
+
+        const { error } = schema.validate(req.body);
+        if (error) {
+            const errs = [new ErrorResponse(error.message, ErrorMessage.ERROR_USER_LOGIN)]
+            return res.status(400).send(errs)
         }
+        next();
+    }
+    validateRegisterParams(req, res, next) {
+        const schema = Joi.object({
+            username: Joi.string().optional(),
+            email: Joi.string().email().required(),
+            password: Joi.string().min(5).required(),
+            phoneNumber: Joi.string().optional(),
+        })
+        const { error } = schema.validate(req.body);
+        if (error) {
+            const errs = [new ErrorResponse(error.message, ErrorMessage.ERROR_USER_REGISTER)]
+            return res.status(400).send(errs)
+        }
+        next()
     }
 }
 
