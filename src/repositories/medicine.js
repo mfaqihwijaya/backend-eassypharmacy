@@ -3,10 +3,10 @@ class MedicinePostgres {
         this.Medicine = db.Medicine
     }
 
-    async getMedicines(limit, offset, order) {
+    async getMedicines(whereSearch, limit, offset, order) {
         try {
             const medicines = await this.Medicine.findAll({
-                where: { deletedAt: null },
+                where: { ...whereSearch, deletedAt: null },
                 limit,
                 offset,
                 order
