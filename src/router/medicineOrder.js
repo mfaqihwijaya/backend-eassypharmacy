@@ -1,8 +1,9 @@
 class MedicineOrderRouter {
-    constructor(app, medicineOrderController, jwtMiddleware) {
+    constructor(app, jwtMiddleware, medicineOrderMiddleware, medicineOrderController) {
         this.medicineOrderController = medicineOrderController
         this.app = app
         this.jwtMiddleware = jwtMiddleware
+        this.medicineOrderMiddleware = medicineOrderMiddleware
     }
 
     mountV1() {
@@ -14,6 +15,9 @@ class MedicineOrderRouter {
         medicineOrders.post(
             async (req, res, next) => {
                 this.jwtMiddleware.authenticate(req, res, next);
+            },
+            async (req, res, next) => {
+                this.medicineOrderMiddleware.validateCreateMedicineOrderParams(req, res, next)
             },
             async (req, res) => {
                 this.medicineOrderController.createMedicineOrder(req, res)
