@@ -12,7 +12,7 @@ class MedicineRouter {
         const medicines = this.app.route(`${v1}/medicines`)
         medicines.get(async (req, res) => {
             this.medicineController.getMedicines(req, res)
-        })
+        })   
 
         // [GET] /api/v1/medicines/:medicineId
         const medicineId = this.app.route(`${v1}/medicines/:medicineId`)
