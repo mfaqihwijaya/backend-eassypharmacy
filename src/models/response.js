@@ -38,6 +38,7 @@ const ErrorMessage = {
     
     "ERROR_MEDICINE_NOT_FOUND": "medicine not found in the system",
     "ERROR_MEDICINE_INVALID_ID": "invalid medicine id",
+    "ERROR_MEDICINE_NOT_ENOUGH": "medicine stock not enough",
 
     "ERROR_MEDICINE_ORDER_UPDATE": "error updating medicine order, please try again",
     "ERROR_MEDICINE_ORDER_FETCH": "error fetching medicine order data, please try again",
