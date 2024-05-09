@@ -15,7 +15,7 @@ class MedicineOrderService {
             if (!user) {
                 throw new Error(ErrorMessage.ERROR_USER_NOT_FOUND);
             }
-            await sequelize.transaction(async (t) => {
+            const result = await sequelize.transaction(async (t) => {
                 const medicine = await this.medicineRepo.getMedicineById(medicineId, t);
                 if (!medicine) {
                     throw new Error(ErrorMessage.ERROR_MEDICINE_NOT_FOUND);
@@ -38,6 +38,7 @@ class MedicineOrderService {
                 await this.medicineRepo.updateMedicine(medicineUpdate, t)
                 return newMedicineOrder;
             })
+            return result;
         } catch (error) {
             throw error;
         }

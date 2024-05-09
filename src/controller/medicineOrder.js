@@ -10,7 +10,6 @@ class MedicineOrderController {
         // call repository
         try {
             const newMedicineOrder = await this.medicineOrderService.createMedicineOrder(payload)
-            console.log(newMedicineOrder);
             const response = new SuccessResponse(SuccessMessage.MEDICINE_ORDER_CREATED, newMedicineOrder)
             res.status(201).send(response)
         } catch (error) {
