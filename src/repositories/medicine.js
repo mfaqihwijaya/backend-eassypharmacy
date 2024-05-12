@@ -17,10 +17,24 @@ class MedicinePostgres {
         }
     }
 
-    async getMedicineById(medicineId) {
+    async getMedicineById(medicineId, transaction = null) {
         try {
-            const medicine = await this.Medicine.findOne({ where: { id: medicineId, deletedAt: null } })
+            const medicine = await this.Medicine.findOne({ 
+                where: { id: medicineId, deletedAt: null },
+                transaction
+            })
             return medicine
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async updateMedicine(medicine, transaction = null) {
+        try {
+            await this.Medicine.update(medicine, {
+                 where: { id: medicine.id },
+                 transaction
+            })
         } catch (error) {
             throw error
         }

@@ -9,8 +9,8 @@ class MedicineOrderController {
         let payload = req.body
         // call repository
         try {
-            await this.medicineOrderService.createMedicineOrder(payload)
-            const response = new SuccessResponse(SuccessMessage.MEDICINE_ORDER_CREATED, payload)
+            const newMedicineOrder = await this.medicineOrderService.createMedicineOrder(payload)
+            const response = new SuccessResponse(SuccessMessage.MEDICINE_ORDER_CREATED, newMedicineOrder)
             res.status(201).send(response)
         } catch (error) {
             const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_ORDER_CREATION, error.message)]
@@ -31,6 +31,18 @@ class MedicineOrderController {
             res.status(200).send(response)
         } catch (error) {
             const errs = [new ErrorResponse(error.message, ErrorMessage.ERROR_MEDICINE_ORDER_FETCH)]
+            res.status(500).send(errs)
+        }
+    }
+
+    async getMedicineOrders(req, res) {
+        try {
+            const { userId } = req.query
+            const medicineOrders = await this.medicineOrderService.getMedicineOrders()
+            const response = new SuccessResponse(SuccessMessage.MEDICINE_ORDER_FETCHED, medicineOrders)
+            res.status(200).send(response)
+        } catch (error) {
+            const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_ORDER_FETCH, error.message)]
             res.status(500).send(errs)
         }
     }

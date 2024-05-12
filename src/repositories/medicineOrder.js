@@ -3,11 +3,9 @@ class MedicineOrderPostgres {
         this.MedicineOrder = db.MedicineOrder;
     }
 
-    async createMedicineOrder(medicineOrder) {
+    async createMedicineOrder(medicineOrder, transaction = null) {
         try {
-            await this.MedicineOrder.create({
-                medicineOrder
-            })
+            await this.MedicineOrder.create(medicineOrder, { transaction })
         } catch (error) {
             throw error;
         }

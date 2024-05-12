@@ -1,3 +1,4 @@
+const { sequelize } = require("../models/db");
 const { ErrorMessage } = require("../models/response");
 
 class MedicineOrderService {
@@ -14,13 +15,30 @@ class MedicineOrderService {
             if (!user) {
                 throw new Error(ErrorMessage.ERROR_USER_NOT_FOUND);
             }
-            const medicine = await this.medicineRepo.getMedicineById(medicineId);
-            if (!medicine) {
-                throw new Error(ErrorMessage.ERROR_MEDICINE_NOT_FOUND);
-            }
-            const subTotal = count * medicine.price;
-            medicineOrder.subTotal = subTotal;
-            await this.medicineOrderRepo.createMedicineOrder(medicineOrder);
+            const result = await sequelize.transaction(async (t) => {
+                const medicine = await this.medicineRepo.getMedicineById(medicineId, t);
+                if (!medicine) {
+                    throw new Error(ErrorMessage.ERROR_MEDICINE_NOT_FOUND);
+                }
+                if(count > medicine.stock) {   
+                    throw new Error(ErrorMessage.ERROR_MEDICINE_NOT_ENOUGH);
+                }
+                // create order
+                const subTotal = count * medicine.price;
+                const newMedicineOrder = {
+                    ...medicineOrder,
+                    subTotal
+                }
+                await this.medicineOrderRepo.createMedicineOrder(newMedicineOrder, t);
+                // update stock
+                const medicineUpdate = {
+                    id: medicine.id,
+                    stock: medicine.stock - count
+                }
+                await this.medicineRepo.updateMedicine(medicineUpdate, t)
+                return newMedicineOrder;
+            })
+            return result;
         } catch (error) {
             throw error;
         }
