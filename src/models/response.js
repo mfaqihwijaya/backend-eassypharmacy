@@ -16,6 +16,7 @@ const ErrorType = {
     "ERROR_MEDICINE_FETCH": "error fetching medicine data",
     "ERROR_MEDICINE_ORDER_CREATION": "error creating medicine order",
     "ERROR_USER_AUTHENTICATION": "error authenticating user",
+    "ERROR_MEDICINE_ORDER_FETCH": "error fetching medicine order data"
 }
 
 const ErrorMessage = {

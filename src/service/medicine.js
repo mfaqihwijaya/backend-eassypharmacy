@@ -10,7 +10,7 @@ class MedicineService {
             const { keyword = '', count = 2, page = 1, column = 'name' } = query
             const whereSearch = {
                 name: {
-                    [Sequelize.Op.like]: `%${keyword}%`
+                    [Sequelize.Op.iLike]: `%${keyword}%`
                 }
             }
             const limit = count
