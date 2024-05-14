@@ -12,7 +12,9 @@ class MedicinePostgres {
                 order
             })
             return medicines
-        } catch (error) {
+        } catch (err) {
+            const error = new Error(err.message);
+            error.status = 500;
             throw error;
         }
     }
@@ -24,7 +26,9 @@ class MedicinePostgres {
                 transaction
             })
             return medicine
-        } catch (error) {
+        } catch (err) {
+            const error = new Error(err.message);
+            error.status = 500;
             throw error
         }
     }
@@ -35,7 +39,9 @@ class MedicinePostgres {
                  where: { id: medicine.id },
                  transaction
             })
-        } catch (error) {
+        } catch (err) {
+            const error = new Error(err.message);
+            error.status = 500;
             throw error
         }
     }

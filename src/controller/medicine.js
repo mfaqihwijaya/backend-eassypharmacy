@@ -10,9 +10,9 @@ class MedicineController {
             const medicines = await this.medicineService.getMedicines(query)
             const response = new SuccessResponse(SuccessMessage.MEDICINE_FETCHED, medicines)
             res.status(200).send(response)
-        } catch (error) {
-            const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_FETCH, error.message)]
-            res.status(500).send(errs)
+        } catch (err) {
+            const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_FETCH, err.message)]
+            res.status(err.status).send(errs)
         }
     }
 
@@ -21,15 +21,15 @@ class MedicineController {
         try {
             const medicine = await this.medicineService.getMedicineById(medicineId)
             if (!medicine) {
-                const errs = [new ErrorResponse(Error.ERROR_MEDICINE_FETCH, ErrorMessage.ERROR_MEDICINE_NOT_FOUND)]
-                res.status(404).send(errs)
-                return
+                const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_FOUND)
+                error.status = 404
+                throw error
             }
             const response = new SuccessResponse(SuccessMessage.MEDICINE_FETCHED, medicine)
             res.status(200).send(response)
-        } catch (error) {
-            const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_FETCH, error.message)]
-            res.status(500).send(errs)
+        } catch (err) {
+            const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_FETCH, err.message)]
+            res.status(err.status).send(errs)
         }
     }
 }
