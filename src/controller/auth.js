@@ -1,4 +1,4 @@
-const { SuccessMessage, ErrorResponse, ErrorMessage, SuccessResponse } = require("../models/response");
+const { SuccessMessage, ErrorResponse, ErrorMessage, SuccessResponse, ErrorType } = require("../models/response");
 
 class AuthController {
     constructor(authService) {
@@ -10,24 +10,23 @@ class AuthController {
             const user = await this.authService.userRegister(payload)
             const response = new SuccessResponse(SuccessMessage.USER_REGISTERED, user)
             res.status(201).send(response)
-        } catch (error) {
-            const errs = [new ErrorResponse(error.message, ErrorMessage.ERROR_USER_REGISTER)]
-            res.status(500).send(errs)
+        } catch (err) {
+            const errs = [new ErrorResponse(ErrorType.ERROR_USER_REGISTER, err.message)]
+            res.status(err.status? err.status: 500).send(errs)
         }
     }
 
     async userLogin(req, res) {
         // get user email and passwordk
         const payload = req.body
-
         // do login logic
         try {
             const token = await this.authService.userLogin(payload)
             const response = new SuccessResponse(SuccessMessage.USER_LOGGED_IN, token)
             res.status(200).send(response)
-        } catch (error) {
-            const errs = [new ErrorResponse(error.message, ErrorMessage.ERROR_USER_LOGIN)]
-            res.status(500).send(errs)
+        } catch (err) {
+            const errs = [new ErrorResponse(ErrorType.ERROR_USER_LOGIN, err.message)]
+            res.status(err.status? err.status: 500).send(errs)
         }
     }
 }
