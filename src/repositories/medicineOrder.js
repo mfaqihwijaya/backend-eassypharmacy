@@ -6,18 +6,22 @@ class MedicineOrderPostgres {
     async createMedicineOrder(medicineOrder, transaction = null) {
         try {
             await this.MedicineOrder.create(medicineOrder, { transaction })
-        } catch (error) {
+        } catch (err) {
+            const error = new Error(err.message);
+            error.status = 500;
             throw error;
         }
     }
 
-    async getMedicineOrders() {
+    async getMedicineOrders(userId) {
         try {
             const medicineOrders = await this.MedicineOrder.findAll({
-                where: { deletedAt: null }
+                where: {userId: userId, deletedAt: null }
             })
             return medicineOrders
-        } catch (error) {
+        } catch (err) {
+            const error = new Error(err.message);
+            error.status = 500;
             throw error;
         }
     }
@@ -26,7 +30,9 @@ class MedicineOrderPostgres {
         try {
             const medicineOrder = await this.MedicineOrder.findOne({ where: { id: medicineOrderId, deletedAt: null } })
             return medicineOrder
-        } catch (error) {
+        } catch (err) {
+            const error = new Error(err.message);
+            error.status = 500;
             throw error
         }
     }

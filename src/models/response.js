@@ -46,6 +46,8 @@ const ErrorMessage = {
     "ERROR_MEDICINE_ORDER_NOT_FOUND": "error medicine order not found in system",
 
     "ERROR_INVALID_MEDICINE_ORDER_ID": "invalid medicine order id",
+
+    "ERROR_RESTRICTED_ACCESS": "user doesn't have an access",
 }
 
 class SuccessResponse {

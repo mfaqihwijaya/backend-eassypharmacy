@@ -83,7 +83,9 @@ class AuthService {
             const { sub } = decoded;
             const user = await this.userRepo.getUserById(sub)
             if(!user) {
-                throw new Error(ErrorMessage.ERROR_INVALID_ACCESS_TOKEN);
+                const error = new Error(ErrorMessage.ERROR_INVALID_ACCESS_TOKEN);
+                error.status = 403;
+                throw error;
             }
             return decoded
         } catch (err) {

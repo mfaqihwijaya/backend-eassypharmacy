@@ -10,7 +10,7 @@ class MedicineOrderRouter {
         // mount all
         const v1 = "/api/v1"
 
-        // [POST] /api/v1/medicine-orders 
+        // [POST, GET] /api/v1/medicine-orders 
         const medicineOrders = this.app.route(`${v1}/medicine-orders`)
         medicineOrders.post(
             async (req, res, next) => {
@@ -21,6 +21,14 @@ class MedicineOrderRouter {
             },
             async (req, res) => {
                 this.medicineOrderController.createMedicineOrder(req, res)
+            }
+        )
+        medicineOrders.get(
+            async (req, res, next) => {
+                this.jwtMiddleware.authenticate(req, res, next);
+            },
+            async (req, res) => {
+                this.medicineOrderController.getMedicineOrders(req, res)
             }
         )
 
@@ -34,7 +42,6 @@ class MedicineOrderRouter {
                 this.medicineOrderController.getMedicineOrderById(req, res)
             }
         )
-
     }
 }
 

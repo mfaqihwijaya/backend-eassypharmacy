@@ -7,7 +7,7 @@ class MedicineService {
 
     async getMedicines(query) {
         try {
-            const { keyword = '', count = 2, page = 1, column = 'name' } = query
+            const { keyword = '', count = 10, page = 1, column = 'name' } = query
             const whereSearch = {
                 name: {
                     [Sequelize.Op.iLike]: `%${keyword}%`
@@ -18,7 +18,9 @@ class MedicineService {
             const order = [[column, 'ASC']]
             const medicines = await this.medicineRepo.getMedicines(whereSearch, limit, offset, order);
             return medicines;
-        } catch (error) {
+        } catch (err) {
+            const error = new Error(err.message)
+            error.status = 500;
             throw error;
         }
     }
@@ -27,7 +29,9 @@ class MedicineService {
         try {
             const medicine = await this.medicineRepo.getMedicineById(medicineId);
             return medicine
-        } catch (error) {
+        } catch (err) {
+            const error = new Error(err.message)
+            error.status = 500
             throw error
         }
     }

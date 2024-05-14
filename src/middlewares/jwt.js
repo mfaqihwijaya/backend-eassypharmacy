@@ -8,15 +8,18 @@ class JWTMiddleware {
         try {
             const token = req.headers.authorization?.split(' ')[1];
             if (!token) {
-                throw new Error(ErrorMessage.ERROR_REQUIRED_ACCESS_TOKEN);
+                const error = new Error(ErrorMessage.ERROR_REQUIRED_ACCESS_TOKEN);
+                error.status = 403;
+                throw error;
             }
             // TODO need to change secret to env
             const decoded = await this.authService.validateUserToken(token);
             req.userId = decoded.sub;
+            console.log('faqih', req.userId);
             next();
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_USER_AUTHENTICATION, err.message)]
-            return res.status(403).send(errs);
+            return res.status(err.status).send(errs);
         }
     }
 }

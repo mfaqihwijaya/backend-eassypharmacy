@@ -13,15 +13,21 @@ class MedicineOrderService {
             const { userId, medicineId, count } = medicineOrder;
             const user = await this.userRepo.getUserById(userId);
             if (!user) {
-                throw new Error(ErrorMessage.ERROR_USER_NOT_FOUND);
+                const error = new Error(ErrorMessage.ERROR_USER_NOT_FOUND);
+                error.status = 404;
+                throw error;
             }
             const result = await sequelize.transaction(async (t) => {
                 const medicine = await this.medicineRepo.getMedicineById(medicineId, t);
                 if (!medicine) {
-                    throw new Error(ErrorMessage.ERROR_MEDICINE_NOT_FOUND);
+                    const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_FOUND);
+                    error.status = 404;
+                    throw error;
                 }
                 if(count > medicine.stock) {   
-                    throw new Error(ErrorMessage.ERROR_MEDICINE_NOT_ENOUGH);
+                    const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_ENOUGH);
+                    error.status = 500;
+                    throw error;
                 }
                 // create order
                 const subTotal = count * medicine.price;
@@ -44,9 +50,15 @@ class MedicineOrderService {
         }
     }
 
-    async getMedicineOrders() {
+    async getMedicineOrders(userId) {
         try {
-            const medicineOrders = await this.medicineOrderRepo.getMedicineOrders();
+            const user = await this.userRepo.getUserById(userId);
+            if (!user) {
+                const error = new Error(ErrorMessage.ERROR_USER_NOT_FOUND);
+                error.status = 404;
+                throw error;
+            }
+            const medicineOrders = await this.medicineOrderRepo.getMedicineOrders(userId);
             return medicineOrders;
         } catch (error) {
             throw error;
@@ -60,6 +72,9 @@ class MedicineOrderService {
         } catch (error) {
             throw error
         }
+    }
+    async checkout(medicineOrderIds) {
+        // TODO checkout logic
     }
 }
 

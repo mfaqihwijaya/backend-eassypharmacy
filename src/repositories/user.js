@@ -11,7 +11,9 @@ class UserPostgres {
                 phoneNumber: user.phoneNumber,
                 password: user.password,
             })
-        } catch (error) {
+        } catch (err) {
+            const error = new Error(err.message);
+            error.status = 500;
             throw error;
         }
     }
@@ -20,7 +22,9 @@ class UserPostgres {
         try {
             const user = await this.User.findOne({ where: { id: userId, deletedAt: null } })
             return user
-        } catch (error) {
+        } catch (err) {
+            const error = new Error(err.message);
+            error.status = 500;
             throw error
         }
     }
@@ -29,7 +33,9 @@ class UserPostgres {
         try {
             const user = await this.User.findOne({ where: { email: email, deletedAt: null } })
             return user
-        } catch (error) {
+        } catch (err) {
+            const error = new Error(err.message);
+            error.status = 500;
             throw error
         }
     }
@@ -37,7 +43,9 @@ class UserPostgres {
         try {
             const user = await this.User.findOne({ where: { username: username, deletedAt: null } })
             return user
-        } catch (error) {
+        } catch (err) {
+            const error = new Error(err.message);
+            error.status = 500;
             throw error
         }
     }
