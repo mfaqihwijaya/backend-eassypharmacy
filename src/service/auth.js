@@ -12,15 +12,19 @@ class AuthService {
             const emailExist = await this.userRepo.getUserByEmail(user.email)
             const usernameExist = await this.userRepo.getUserByUsername(user.username)
             if (emailExist) {
-                throw new Error(ErrorMessage.ERROR_USER_EMAIL_USED)
+                const error = new Error(ErrorMessage.ERROR_USER_EMAIL_USED)
+                error.status = 500
+                throw error
             }
             if (usernameExist) {
-                throw new Error(ErrorMessage.ERROR_USER_USERNAME_USED)
+                const error = new Error(ErrorMessage.ERROR_USER_USERNAME_USED)
+                error.status = 500
+                throw error
             }
             const hashedPassword = await this.hashPassword(user.password)
             user.password = hashedPassword
-            const userData = await this.userRepo.createUser(user)
-            return userData
+            await this.userRepo.createUser(user)
+            return user
         } catch (error) {
             throw error
         }
@@ -30,14 +34,18 @@ class AuthService {
             // get user by email
             const userData = await this.userRepo.getUserByEmail(user.email)
             if (!userData) {
-                throw new Error(ErrorMessage.ERROR_USER_NOT_FOUND)
+                const error = new Error(ErrorMessage.ERROR_USER_NOT_FOUND)
+                error.status = 404
+                throw error
             }
             // compare password
             const hashedPassword = userData.password
             const plainPassword = user.password
             const isMatch = await this.comparePassword(plainPassword, hashedPassword)
             if (!isMatch) {
-                throw new Error(ErrorMessage.ERROR_INVALID_PASSWORD)
+                const error = new Error(ErrorMessage.ERROR_INVALID_PASSWORD)
+                error.status = 400
+                throw error
             }
             // generate token
             const tokens = await this.createUserToken(userData)
@@ -51,31 +59,40 @@ class AuthService {
             const salt = await bcrypt.genSalt(10)
             const hashed = await bcrypt.hash(password, salt)
             return hashed
-        } catch (error) {
+        } catch (err) {
+            const error = new Error(err.message)
+            error.status = 500
             throw error
         }
     }
     async comparePassword(password, hashed) {
         try {
             return await bcrypt.compare(password, hashed)
-        } catch (error) {
+        } catch (err) {
+            const error = new Error(err.message)
+            error.status = 500
             throw error
         }
     }
     async createUserToken(userData) {
-        // membuat claim
-        // sub, iat,
-        const now = new Date()
-        const claims = {
-            sub: userData.id,
+        try {
+            // membuat claim
+            // sub, iat
+            const now = new Date()
+            const claims = {
+                sub: userData.id,
+                iat: now
+            }
+            // membuat jwt accessToken
+            const accessToken = jwt.sign(claims, this.sessionConfig.secret)
+            // generate token model
+            const tokens = new Token(accessToken)
+            return tokens
+        } catch (err) {
+            const error = new Error(err.message)
+            error.status = 500
+            throw error
         }
-
-        // membuat jwt accessToken
-        const accessToken = jwt.sign(claims, this.sessionConfig.secret)
-
-        // generate token model
-        const tokens = new Token(accessToken)
-        return tokens
     }
     async validateUserToken(token) {
         try {
@@ -89,7 +106,9 @@ class AuthService {
             }
             return decoded
         } catch (err) {
-            throw err
+            const error = new Error(err.message)
+            error.status = 500
+            throw error
         }
     }
 }
