@@ -12,7 +12,7 @@ class AuthController {
             res.status(201).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_USER_REGISTER, err.message)]
-            res.status(err.status).send(errs)
+            res.status(err.status? err.status: 500).send(errs)
         }
     }
 
@@ -26,7 +26,7 @@ class AuthController {
             res.status(200).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_USER_LOGIN, err.message)]
-            res.status(err.status).send(errs)
+            res.status(err.status? err.status: 500).send(errs)
         }
     }
 }

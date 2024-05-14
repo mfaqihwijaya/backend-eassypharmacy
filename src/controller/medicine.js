@@ -12,7 +12,7 @@ class MedicineController {
             res.status(200).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_FETCH, err.message)]
-            res.status(err.status).send(errs)
+            res.status(err.status? err.status: 500).send(errs)
         }
     }
 
@@ -29,7 +29,7 @@ class MedicineController {
             res.status(200).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_FETCH, err.message)]
-            res.status(err.status).send(errs)
+            res.status(err.status? err.status: 500).send(errs)
         }
     }
 }

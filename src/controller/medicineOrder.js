@@ -13,7 +13,7 @@ class MedicineOrderController {
             res.status(201).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_ORDER_CREATION, err.message)]
-            res.status(err.status).send(errs)
+            res.status(err.status? err.status: 500).send(errs)
         }
     }
 
@@ -36,7 +36,7 @@ class MedicineOrderController {
             res.status(200).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_ORDER_FETCH, err.message)]
-            res.status(err.status).send(errs)
+            res.status(err.status? err.status: 500).send(errs)
         }
     }
 
@@ -48,7 +48,7 @@ class MedicineOrderController {
             res.status(200).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_ORDER_FETCH, err.message)]
-            res.status(err.status).send(errs)
+            res.status(err.status? err.status: 500).send(errs)
         }
     }
     async checkout(req, res) {
@@ -65,7 +65,7 @@ class MedicineOrderController {
             res.status(200).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_ORDER_FETCH, err.message)]
-            res.status(err.status).send(errs)
+            res.status(err.status? err.status: 500).send(errs)
         }
     }
 }
