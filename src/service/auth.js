@@ -81,7 +81,7 @@ class AuthService {
             const now = new Date()
             const claims = {
                 sub: userData.id,
-                iat: now
+                iat: now.getTime()
             }
             // membuat jwt accessToken
             const accessToken = jwt.sign(claims, this.sessionConfig.secret)

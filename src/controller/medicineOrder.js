@@ -7,7 +7,8 @@ class MedicineOrderController {
 
     async createMedicineOrder(req, res) {
         try {
-            let payload = req.body
+            const { userId } = req
+            const payload = {userId, ...req.body}
             const newMedicineOrder = await this.medicineOrderService.createMedicineOrder(payload)
             const response = new SuccessResponse(SuccessMessage.MEDICINE_ORDER_CREATED, newMedicineOrder)
             res.status(201).send(response)

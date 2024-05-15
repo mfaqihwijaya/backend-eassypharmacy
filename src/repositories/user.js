@@ -16,7 +16,7 @@ class UserPostgres {
         }
     }
 
-    async getProfile(userId) {
+    async getUserById(userId) {
         try {
             const user = await this.User.findOne({ where: { id: userId, deletedAt: null } })
             return user
