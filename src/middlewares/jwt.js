@@ -15,7 +15,6 @@ class JWTMiddleware {
             // TODO need to change secret to env
             const decoded = await this.authService.validateUserToken(token);
             req.userId = decoded.sub;
-            console.log('faqih', req.userId);
             next();
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_USER_AUTHENTICATION, err.message)]
