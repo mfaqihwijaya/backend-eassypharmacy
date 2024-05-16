@@ -20,11 +20,6 @@ class MedicineController {
         const medicineId = req.params.medicineId
         try {
             const medicine = await this.medicineService.getMedicineById(medicineId)
-            if (!medicine) {
-                const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_FOUND)
-                error.status = 404
-                throw error
-            }
             const response = new SuccessResponse(SuccessMessage.MEDICINE_FETCHED, medicine)
             res.status(200).send(response)
         } catch (err) {
