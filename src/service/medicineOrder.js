@@ -11,19 +11,21 @@ class MedicineOrderService {
     async createMedicineOrder(medicineOrder) {
         try {
             const { userId, medicineId, count } = medicineOrder;
-            const user = await this.userRepo.getUserById(userId);
-            if (!user) {
-                const error = new Error(ErrorMessage.ERROR_USER_NOT_FOUND);
-                error.status = 404;
-                throw error;
-            }
             const result = await sequelize.transaction(async (t) => {
+                // check user & medicine is exist
+                const user = await this.userRepo.getUserById(userId, t);
+                if (!user) {
+                    const error = new Error(ErrorMessage.ERROR_USER_NOT_FOUND);
+                    error.status = 404;
+                    throw error;
+                }
                 const medicine = await this.medicineRepo.getMedicineById(medicineId, t);
                 if (!medicine) {
                     const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_FOUND);
                     error.status = 404;
                     throw error;
                 }
+                // check medicine stock
                 if(count > medicine.stock) {   
                     const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_ENOUGH);
                     error.status = 500;
@@ -65,9 +67,14 @@ class MedicineOrderService {
         }
     }
 
-    async getMedicineOrderById(medicineOrderId) {
+    async getMedicineOrderById(medicineOrderId, userId) {
         try {
             const medicineOrder = await this.medicineOrderRepo.getMedicineOrderById(medicineOrderId);
+            if (!medicineOrder || medicineOrder.userId != userId) {
+                const error = new Error(ErrorMessage.ERROR_MEDICINE_ORDER_NOT_FOUND)
+                error.status = 404
+                throw error
+            }
             return medicineOrder
         } catch (error) {
             throw error

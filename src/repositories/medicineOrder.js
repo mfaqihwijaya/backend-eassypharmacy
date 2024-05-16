@@ -7,9 +7,7 @@ class MedicineOrderPostgres {
         try {
             await this.MedicineOrder.create(medicineOrder, { transaction })
         } catch (err) {
-            const error = new Error(err.message);
-            error.status = 500;
-            throw error;
+            throw err;
         }
     }
 
@@ -20,9 +18,7 @@ class MedicineOrderPostgres {
             })
             return medicineOrders
         } catch (err) {
-            const error = new Error(err.message);
-            error.status = 500;
-            throw error;
+            throw err;
         }
     }
 
@@ -31,9 +27,7 @@ class MedicineOrderPostgres {
             const medicineOrder = await this.MedicineOrder.findOne({ where: { id: medicineOrderId, deletedAt: null } })
             return medicineOrder
         } catch (err) {
-            const error = new Error(err.message);
-            error.status = 500;
-            throw error
+            throw err;
         }
     }
 }

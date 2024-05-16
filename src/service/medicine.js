@@ -1,4 +1,5 @@
 const { Sequelize } = require("../models/db")
+const { ErrorMessage } = require("../models/response")
 
 class MedicineService {
     constructor(medicineRepo) {
@@ -28,6 +29,11 @@ class MedicineService {
     async getMedicineById(medicineId) {
         try {
             const medicine = await this.medicineRepo.getMedicineById(medicineId);
+            if (!medicine) {
+                const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_FOUND)
+                error.status = 404
+                throw error
+            }
             return medicine
         } catch (err) {
             const error = new Error(err.message)

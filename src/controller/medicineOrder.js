@@ -22,17 +22,7 @@ class MedicineOrderController {
         try {
             const { medicineOrderId } = req.params
             const { userId } = req
-            const medicineOrder = await this.medicineOrderService.getMedicineOrderById(medicineOrderId)
-            if (!medicineOrder) {
-                const error = new Error(ErrorMessage.ERROR_MEDICINE_ORDER_NOT_FOUND)
-                error.status = 404
-                throw error
-            }
-            if (medicineOrder.userId !== userId) {
-                const error = new Error(ErrorMessage.ERROR_RESTRICTED_ACCESS)
-                error.status = 403
-                throw error
-            }
+            const medicineOrder = await this.medicineOrderService.getMedicineOrderById(medicineOrderId, userId)
             const response = new SuccessResponse(SuccessMessage.MEDICINE_ORDER_FETCHED, medicineOrder)
             res.status(200).send(response)
         } catch (err) {
