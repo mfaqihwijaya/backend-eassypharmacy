@@ -9,6 +9,7 @@ class UserPostgres {
                 username: user.username,
                 email: user.email,
                 phoneNumber: user.phoneNumber,
+                address: user.address,
                 password: user.password,
             })
         } catch (err) {

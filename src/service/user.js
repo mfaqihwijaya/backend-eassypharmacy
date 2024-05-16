@@ -23,6 +23,7 @@ class UserService {
                 username: user.username,
                 email: user.email,
                 phoneNumber: user.phoneNumber,
+                address: user.address
             }
             return profile
         } catch (err) {

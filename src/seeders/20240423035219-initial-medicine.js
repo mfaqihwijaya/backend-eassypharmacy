@@ -19,6 +19,7 @@ module.exports = {
         price: 10000,
         stock: 5,
         image: "https://media.istockphoto.com/id/1217118257/id/foto/wanita-memegang-kotak-tablet-parasetamol-1000mg-di-tangannya-dan-segelas-air.webp?s=612x612&w=is&k=20&c=ES38si9xIzj6L-4fyjFqpxenhEyH9lextXaBw6mr-eI=",
+        category: "Analgesik", 
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -28,6 +29,7 @@ module.exports = {
           price: 12000,
           stock: 8,
           image: "https://media.istockphoto.com/id/1163798570/photo/ibuprofen-medication.webp?s=612x612&w=is&k=20&c=QKM0z6zd_EbsVUA6u8PWaB2DGIsAnUiLhieCixtBW90=",
+          category: "Analgesik",
           createdAt: new Date(),
           updatedAt: new Date()
       },
@@ -37,6 +39,7 @@ module.exports = {
           price: 8000,
           stock: 10,
           image: "https://media.istockphoto.com/id/458563393/photo/aspirin-bottle-with-tablets-spilling-out.webp?s=612x612&w=is&k=20&c=r_k8dH2r0vQ24XMKFrRMxMz_tvQkPrS3d3MgCtaK8IU=",
+          category: "Analgesik",
           createdAt: new Date(),
           updatedAt: new Date()
       },
@@ -46,6 +49,7 @@ module.exports = {
           price: 15000,
           stock: 3,
           image: "https://media.istockphoto.com/id/1164018543/photo/generic-tablets-of-ciprofloxacin-antibiotics.webp?s=612x612&w=is&k=20&c=KSBbNw9e1e_yc3fMhHYiBKF3zITPqXe5v7VOHsIabo4=",
+          category: "Antiinflamasi",
           createdAt: new Date(),
           updatedAt: new Date()
       },
@@ -55,6 +59,7 @@ module.exports = {
           price: 18000,
           stock: 7,
           image: "https://media.istockphoto.com/id/1295333389/photo/amoxicillin.webp?s=612x612&w=is&k=20&c=AfyC_jSSuYHJuhxHkftdhhlF3wUbqR18_dQNMI5kvhI=",
+          category: "Antibiotik",
           createdAt: new Date(),
           updatedAt: new Date()
       },
@@ -64,6 +69,7 @@ module.exports = {
           price: 9000,
           stock: 15,
           image: "https://media.istockphoto.com/id/1343262408/photo/generic-box-of-loratadine-or-allergy-relief-pills-white-background.webp?s=612x612&w=is&k=20&c=n4LNTeTecuDT0X07RQ0efAviSoH_ltfNHYdmi5VwS8I=",
+          category: "Antibiotik",
           createdAt: new Date(),
           updatedAt: new Date()
       },
@@ -73,6 +79,7 @@ module.exports = {
           price: 20000,
           stock: 20,
           image: "https://media.istockphoto.com/id/1297469143/photo/packet-of-generic-omeprazole-pills.webp?s=612x612&w=is&k=20&c=F9pg9CyKFxL3FhVbj9ligUfE4n53AP0NYp5KfLGNY_4=",
+          category: "Bronkodilator",
           createdAt: new Date(),
           updatedAt: new Date()
       },
@@ -82,6 +89,7 @@ module.exports = {
           price: 25000,
           stock: 12,
           image: "https://media.istockphoto.com/id/1295607003/photo/benzodiazepine.webp?s=612x612&w=is&k=20&c=uN-J9Q7mK9ENnZ8zSU2sdXOSIwDeLs2mmzsufhX4GqQ=",
+          category: "Antidepresan",
           createdAt: new Date(),
           updatedAt: new Date()
       },
@@ -91,6 +99,7 @@ module.exports = {
           price: 13000,
           stock: 6,
           image: "https://media.istockphoto.com/id/472120679/photo/metformin.webp?s=612x612&w=is&k=20&c=slHlmbW9sn4ZeKxT2vtNlZclURlw2ius0WMDMhdEjvg=",
+          category: "Antidepresan",
           createdAt: new Date(),
           updatedAt: new Date()
       },
@@ -100,6 +109,7 @@ module.exports = {
           price: 22000,
           stock: 9,
           image: "https://media.istockphoto.com/id/488048497/photo/three-atorvastatin-tablets-close-up.webp?s=612x612&w=is&k=20&c=EaY9IdxSOeeOTkfPHXdmSuRBjaBXxXPeL-QOdcV9a7k=",
+          category: "Antidepresan",
           createdAt: new Date(),
           updatedAt: new Date()
       },
@@ -109,6 +119,7 @@ module.exports = {
           price: 18000,
           stock: 11,
           image: "https://amanfarma.com/wp-content/uploads/2022/06/WhatsApp-Image-2022-06-16-at-10.36.00-768x768.jpeg",
+          category: "Antidepresan",
           createdAt: new Date(),
           updatedAt: new Date()
       },
@@ -118,6 +129,7 @@ module.exports = {
           price: 15000,
           stock: 18,
           image: "https://amanfarma.com/wp-content/uploads/2022/05/Diphenhydramine-1-510x510.jpg",
+          category: "Antibiotik",
           createdAt: new Date(),
           updatedAt: new Date()
       },
@@ -127,6 +139,7 @@ module.exports = {
           price: 17000,
           stock: 13,
           image: "https://d3bbrrd0qs69m4.cloudfront.net/images/product/large/apotek_online_k24klik_20200814033654359225_HYDROCHLOROTHIAZIDE.jpg",
+          category: "Antidiabetik",
           createdAt: new Date(),
           updatedAt: new Date()
       },
@@ -136,6 +149,7 @@ module.exports = {
           price: 10000,
           stock: 22,
           image: "https://d3bbrrd0qs69m4.cloudfront.net/images/product/large/apotek_online_k24klik_20230406105349359225_CETIRIZINE-KF.png",
+          category: "Antidiabetik",
           createdAt: new Date(),
           updatedAt: new Date()
       },
@@ -145,6 +159,7 @@ module.exports = {
           price: 30000,
           stock: 4,
           image: "https://kalbemed.com/storage/images/products/8db30ffa6d2691c11318d87237ddcc6c.jpeg",
+          category: "Antidiabetik",
           createdAt: new Date(),
           updatedAt: new Date()
       },
@@ -154,6 +169,7 @@ module.exports = {
         price: 11000,
         stock: 14,
         image: "https://kalbemed.com/storage/images/products/90b15a1892df4878e2fc24495c3c891b.jpg",
+        category: "Antihistamin",
         createdAt: new Date(),
         updatedAt: new Date()
       },
@@ -163,6 +179,7 @@ module.exports = {
           price: 24000,
           stock: 9,
           image: "https://kalbemed.com/storage/images/products/ddc84f302254ea6da58e57f362b33823.jpg",
+          category: "Antihipertensi",
           createdAt: new Date(),
           updatedAt: new Date()
       },
@@ -172,6 +189,7 @@ module.exports = {
           price: 17000,
           stock: 12,
           image: "https://www.meldinpharma.com/web/image/product.product/2971/image_1024/%5BUKP_GEN-182%5D%20Lisinopril%2010mg%20Cap%2028%27s%20%28Teva%29?unique=ccfd778",
+          category: "Antipiretik",
           createdAt: new Date(),
           updatedAt: new Date()
       },
@@ -181,6 +199,7 @@ module.exports = {
           price: 19000,
           stock: 8,
           image: "https://kalbemed.com/storage/images/products/4d9860fd6a15755c27a082ed3d118c80.jpg",
+          category: "Antipiretik",
           createdAt: new Date(),
           updatedAt: new Date()
       },
@@ -190,6 +209,7 @@ module.exports = {
           price: 16000,
           stock: 10,
           image: "https://www.k24klik.com/images/product/apotek_online_k24klik_201807271107274677_cephalexin.jpg",
+          category: "Analgesik",
           createdAt: new Date(),
           updatedAt: new Date()
       }

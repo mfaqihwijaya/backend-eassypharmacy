@@ -13,11 +13,13 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       MedicineOrder.belongsTo(models.User, { foreignKey: 'userId' });
       MedicineOrder.belongsTo(models.Medicine, { foreignKey: 'medicineId' });
+      MedicineOrder.belongsTo(models.Order, { foreignKey: 'orderId' });
     }
   }
   MedicineOrder.init({
     userId: DataTypes.INTEGER,
     medicineId: DataTypes.INTEGER,
+    orderId: DataTypes.INTEGER,
     count: DataTypes.INTEGER,
     subTotal: DataTypes.FLOAT
   }, {
