@@ -13,20 +13,20 @@ class AuthService {
             const usernameExist = await this.userRepo.getUserByUsername(user.username)
             if (emailExist) {
                 const error = new Error(ErrorMessage.ERROR_USER_EMAIL_USED)
-                error.status = 500
+                error.status = 409
                 throw error
             }
             if (usernameExist) {
                 const error = new Error(ErrorMessage.ERROR_USER_USERNAME_USED)
-                error.status = 500
+                error.status = 409
                 throw error
             }
             const hashedPassword = await this.hashPassword(user.password)
             user.password = hashedPassword
             await this.userRepo.createUser(user)
             return user
-        } catch (error) {
-            throw error
+        } catch (err) {
+            throw err;
         }
     }
     async userLogin(user) {
@@ -44,14 +44,14 @@ class AuthService {
             const isMatch = await this.comparePassword(plainPassword, hashedPassword)
             if (!isMatch) {
                 const error = new Error(ErrorMessage.ERROR_INVALID_PASSWORD)
-                error.status = 400
+                error.status = 403
                 throw error
             }
             // generate token
             const tokens = await this.createUserToken(userData)
             return tokens
-        } catch (error) {
-            throw error
+        } catch (err) {
+            throw err;
         }
     }
     async hashPassword(password) {
@@ -60,18 +60,14 @@ class AuthService {
             const hashed = await bcrypt.hash(password, salt)
             return hashed
         } catch (err) {
-            const error = new Error(err.message)
-            error.status = 500
-            throw error
+            throw err;
         }
     }
     async comparePassword(password, hashed) {
         try {
             return await bcrypt.compare(password, hashed)
         } catch (err) {
-            const error = new Error(err.message)
-            error.status = 500
-            throw error
+            throw err;
         }
     }
     async createUserToken(userData) {
@@ -89,9 +85,7 @@ class AuthService {
             const tokens = new Token(accessToken)
             return tokens
         } catch (err) {
-            const error = new Error(err.message)
-            error.status = 500
-            throw error
+            throw err;
         }
     }
     async validateUserToken(token) {
@@ -106,9 +100,7 @@ class AuthService {
             }
             return decoded
         } catch (err) {
-            const error = new Error(err.message)
-            error.status = 500
-            throw error
+            throw err;
         }
     }
 }
