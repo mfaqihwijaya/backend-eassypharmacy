@@ -8,7 +8,7 @@ class MedicineService {
 
     async getMedicines(query) {
         try {
-            const { keyword = '', count = 10, page = 1, column = 'name' } = query
+            const { keyword = '', count = 10, page = 1, column = 'name', orderType = 'ASC' } = query
             const whereSearch = {
                 name: {
                     [Sequelize.Op.iLike]: `%${keyword}%`
@@ -16,7 +16,7 @@ class MedicineService {
             }
             const limit = count
             const offset = count * (page - 1)
-            const order = [[column, 'ASC']]
+            const order = [[column, orderType]]
             const medicines = await this.medicineRepo.getMedicines(whereSearch, limit, offset, order);
             return medicines;
         } catch (err) {
