@@ -70,9 +70,14 @@ class MedicineOrderService {
     async getMedicineOrderById(medicineOrderId, userId) {
         try {
             const medicineOrder = await this.medicineOrderRepo.getMedicineOrderById(medicineOrderId);
-            if (!medicineOrder || medicineOrder.userId != userId) {
+            if (!medicineOrder) {
                 const error = new Error(ErrorMessage.ERROR_MEDICINE_ORDER_NOT_FOUND)
                 error.status = 404
+                throw error
+            }
+            if (medicineOrder.userId != userId) {
+                const error = new Error(ErrorMessage.ERROR_RESTRICTED_ACCESS)
+                error.status = 403
                 throw error
             }
             return medicineOrder

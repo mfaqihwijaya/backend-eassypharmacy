@@ -10,6 +10,9 @@ const SuccessMessage = {
     "MEDICINE_ORDER_CREATED": "medicine order data successfully created",
     "MEDICINE_ORDER_FETCHED": "medicine order data successfully fetched",
     "MEDICINE_ORDER_UPDATED": "medicine order data succesfully updated",
+
+    "ORDER_FETCHED": "order data successfully fetched",
+    "ORDER_UPDATED": "order data succesfully updated",
 }
 
 const ErrorType = {
@@ -20,6 +23,8 @@ const ErrorType = {
     "ERROR_MEDICINE_ORDER_FETCH": "error fetching medicine order data",
     "ERROR_USER_REGISTER": "error creating user",
     "ERROR_USER_LOGIN": "error logging in user",
+    "ERROR_ORDER_FETCH": "error fetching order data",
+    "ERROR_ORDER_UPDATE": "error updating order data",
 }
 
 const ErrorMessage = {
@@ -47,8 +52,9 @@ const ErrorMessage = {
     "ERROR_MEDICINE_ORDER_UPDATE": "error updating medicine order, please try again",
     "ERROR_MEDICINE_ORDER_FETCH": "error fetching medicine order data, please try again",
     "ERROR_MEDICINE_ORDER_NOT_FOUND": "error medicine order not found in system",
-
     "ERROR_INVALID_MEDICINE_ORDER_ID": "invalid medicine order id",
+
+    "ERROR_ORDER_NOT_FOUND": "error order not found in system",
 
     "ERROR_RESTRICTED_ACCESS": "user doesn't have an access",
 }
