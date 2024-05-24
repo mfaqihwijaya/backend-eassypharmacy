@@ -2,7 +2,14 @@ class OrderPostgres {
     constructor(db) {
         this.Order = db.Medicine
     }
-
+    async createOrder(order, transaction = null) {
+        try {
+            const newOrder = await this.Order.create(order, { transaction })
+            return newOrder
+        } catch (err) {
+            throw err;
+        }
+    }
     async getOrders(userId) {
         try {
             const orders = await this.Order.findAll({

@@ -6,7 +6,6 @@ class OrderService {
         this.orderRepo = orderRepo
         this.userRepo = userRepo
     }
-
     async getOrders(userId) {
         try {
             const user = await this.userRepo.getUserById(userId);
