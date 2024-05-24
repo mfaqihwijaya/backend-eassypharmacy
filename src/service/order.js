@@ -41,11 +41,9 @@ class OrderService {
     async updateOrderAddress(userId, orderId, address) {
         try {
             const updateData = {
-                id: orderId,
-                userId,
                 address
-            }
-            const affectedRows = await this.orderRepo.updateOrder(updateData);
+            };
+            const affectedRows = await this.orderRepo.updateOrder(orderId, userId, updateData);
             return affectedRows
         } catch (error) {
             throw error
@@ -53,4 +51,4 @@ class OrderService {
     }
 }
 
-module.exports = { MedicineOrderService }
+module.exports = { OrderService }

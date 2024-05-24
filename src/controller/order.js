@@ -1,6 +1,6 @@
 const { SuccessMessage, ErrorResponse, ErrorMessage, SuccessResponse, ErrorType } = require("../models/response");
 
-class UserController {
+class OrderController {
     constructor(orderService) {
         this.orderService = orderService
     }
@@ -42,4 +42,4 @@ class UserController {
     }
 }
 
-module.exports = { UserController }
+module.exports = { OrderController }
