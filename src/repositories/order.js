@@ -1,6 +1,6 @@
 class OrderPostgres {
     constructor(db) {
-        this.Order = db.Medicine
+        this.Order = db.Order
     }
     async createOrder(order, transaction = null) {
         try {
@@ -10,7 +10,7 @@ class OrderPostgres {
             throw err;
         }
     }
-    async getOrders(userId) {
+    async getOrders(userId, transaction = null) {
         try {
             const orders = await this.Order.findAll({
                 where: { userId, status: 0, deletedAt: null },
@@ -22,7 +22,7 @@ class OrderPostgres {
         }
     }
 
-    async getOrderById(orderId) {
+    async getOrderById(orderId, transaction = null) {
         try {
             const order = await this.Order.findOne({ 
                 where: { id: orderId, deletedAt: null },
@@ -34,10 +34,10 @@ class OrderPostgres {
         }
     }
 
-    async updateOrder(order, transaction = null) {
+    async updateOrder(orderId, userId, order, transaction = null) {
         try {
             const [affectedRows] = await this.Order.update(order, {
-                 where: { id: order.id, userId: order.userId },
+                 where: { id: orderId, userId},
                  transaction
             })
             return affectedRows;
@@ -47,4 +47,4 @@ class OrderPostgres {
     }
 }
 
-module.exports = { MedicinePostgres }
+module.exports = { OrderPostgres }

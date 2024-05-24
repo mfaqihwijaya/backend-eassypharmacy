@@ -1,3 +1,5 @@
+const { Sequelize } = require("../models/db");
+
 class MedicineOrderPostgres {
     constructor(db) {
         this.MedicineOrder = db.MedicineOrder;
@@ -34,7 +36,7 @@ class MedicineOrderPostgres {
         try {
             const medicineOrders = await this.MedicineOrder.findAll({ 
                 where: { id: {
-                    [Op.in]: medicineOrderIds 
+                    [Sequelize.Op.in]: medicineOrderIds 
                 }, orderId:null, deletedAt: null }, transaction })
             return medicineOrders
         } catch (err) {
