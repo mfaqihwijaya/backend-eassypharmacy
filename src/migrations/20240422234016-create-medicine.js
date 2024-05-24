@@ -16,6 +16,24 @@ module.exports = {
       description: {
         type: Sequelize.TEXT
       },
+      indication: {
+        type: Sequelize.TEXT
+      },
+      contraIndication: {
+        type: Sequelize.TEXT
+      },
+      composition: {
+        type: Sequelize.TEXT
+      },
+      dose: {
+        type: Sequelize.TEXT
+      },
+      usage: {
+        type: Sequelize.TEXT
+      },
+      sideEffect: {
+        type: Sequelize.TEXT
+      },
       price: {
         allowNull: false,
         type: Sequelize.FLOAT
@@ -26,8 +44,12 @@ module.exports = {
       image: {
         type: Sequelize.STRING
       },
-      category: {
-        type: Sequelize.STRING
+      categoryId: {
+        allowNull: false,
+        references: { model: {
+          tableName: 'MedicineCategories',
+        }, key: 'id'},
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,
