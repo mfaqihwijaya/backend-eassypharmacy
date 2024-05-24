@@ -65,7 +65,7 @@ async function prepare() {
   const medicineOrderController = new MedicineOrderController(medicineOrderService);
 
   const orderRepo = new OrderPostgres(db);
-  const orderService = new OrderService(orderRepo, userRepo);
+  const orderService = new OrderService(orderRepo, userRepo, medicineOrderRepo, medicineRepo);
   const orderController = new OrderController(orderService);
 
   // middleware

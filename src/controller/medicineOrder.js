@@ -42,23 +42,6 @@ class MedicineOrderController {
             res.status(err.status? err.status: 500).send(errs)
         }
     }
-    async checkout(req, res) {
-        try {
-            const { medicineOrders } = req.body
-            const { userId } = req
-            const isMatchUserId = medicineOrders.every(medicineOrders => medicineOrders.userId === userId)
-            if(!isMatchUserId) {
-                const error = new Error(ErrorMessage.ERROR_RESTRICTED_ACCESS)
-                error.status = 403
-                throw error
-            }
-            // TODO checkout logic
-            res.status(200).send(response)
-        } catch (err) {
-            const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_ORDER_FETCH, err.message)]
-            res.status(err.status? err.status: 500).send(errs)
-        }
-    }
 }
 
 module.exports = { MedicineOrderController }

@@ -18,6 +18,14 @@ class OrderRouter {
             async (req, res) => {
                 this.orderController.getOrders(req, res)
             }
+        )
+        orders.post(
+            async (req, res, next) => {
+                this.jwtMiddleware.authenticate(req, res, next);
+            },
+            async (req, res) => {
+                this.orderController.checkout(req, res)
+            }
         )   
 
         // [GET] /api/v1/orders/:orderId

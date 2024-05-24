@@ -2,9 +2,11 @@ const { sequelize } = require("../models/db");
 const { ErrorMessage } = require("../models/response");
 
 class OrderService {
-    constructor(orderRepo, userRepo) {
+    constructor(orderRepo, userRepo, medicineOrderRepo, medicineRepo) {
         this.orderRepo = orderRepo
         this.userRepo = userRepo
+        this.medicineOrderRepo = medicineOrderRepo
+        this.medicineRepo = medicineRepo
     }
     async getOrders(userId) {
         try {
@@ -47,6 +49,78 @@ class OrderService {
             return affectedRows
         } catch (error) {
             throw error
+        }
+    }
+    async checkout(userId, medicineOrderIds) {
+        try {
+            // check user & medicine is exist
+            const user = await this.userRepo.getUserById(userId);
+            if (!user) {
+                const error = new Error(ErrorMessage.ERROR_USER_NOT_FOUND);
+                error.status = 404;
+                throw error;
+            }
+            const result = await sequelize.transaction(async (t) => {
+                const medicineOrders = await this.medicineOrderRepo.getMedicineOrderByIds(medicineOrderIds, t);
+                if(medicineOrders.length == 0) {
+                    const error = new Error(ErrorMessage.ERROR_MEDICINE_ORDER_NOT_FOUND);
+                    error.status = 404;
+                    throw error
+                }
+                const total = await medicineOrders.reduce((total, medicineOrder) => total + medicineOrder.subTotal, 0)
+                const newOrderData = {
+                    userId,
+                    total,
+                    address: user.address,
+                    paidAt: new Date()
+                }
+                const order = await this.orderRepo.createOrder(newOrderData, t)
+
+                for (const medicineOrder of medicineOrders) {
+                    const { medicineId, count } = medicineOrder;
+
+                    if (medicineOrder.userId !== userId) {
+                        const error = new Error(ErrorMessage.ERROR_RESTRICTED_ACCESS);
+                        error.status = 403;
+                        throw error;
+                    }
+
+                    // Check if medicine exists
+                    const medicine = await this.medicineRepo.getMedicineById(medicineId, t);
+                    if (!medicine) {
+                        const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_FOUND);
+                        error.status = 404;
+                        throw error;
+                    }
+
+                    // Check medicine stock
+                    if (count > medicine.stock) {
+                        const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_ENOUGH);
+                        error.status = 500;
+                        throw error;
+                    }
+
+                    // Update medicine stock
+                    const medicineUpdate = {
+                        id: medicine.id,
+                        stock: medicine.stock - count
+                    };
+                    await this.medicineRepo.updateMedicine(medicineUpdate, t);
+
+                    // Update medicine order
+                    const medicineOrderUpdate = {
+                        id: medicineOrder.id,
+                        orderId: order.id
+                    };
+                    await this.medicineOrderRepo.updateMedicineOrder(medicineOrderUpdate, t);
+                }
+
+                // Return the created order
+                return order;
+            })
+            return result
+        } catch (err) {
+            throw err
         }
     }
 }
