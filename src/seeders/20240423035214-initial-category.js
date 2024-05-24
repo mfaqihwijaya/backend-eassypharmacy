@@ -13,7 +13,7 @@ module.exports = {
      * }], {});
     */
 
-    await queryInterface.bulkInsert('Categories', [
+    await queryInterface.bulkInsert('MedicineCategories', [
       {
         name: 'Antibiotik',
         createdAt: new Date(),
