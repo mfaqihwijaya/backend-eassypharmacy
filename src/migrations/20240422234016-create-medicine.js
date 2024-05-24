@@ -16,6 +16,24 @@ module.exports = {
       description: {
         type: Sequelize.TEXT
       },
+      indication: {
+        type: Sequelize.TEXT
+      },
+      contraIndication: {
+        type: Sequelize.TEXT
+      },
+      composition: {
+        type: Sequelize.TEXT
+      },
+      dose: {
+        type: Sequelize.TEXT
+      },
+      usage: {
+        type: Sequelize.TEXT
+      },
+      sideEffects: {
+        type: Sequelize.TEXT
+      },
       price: {
         allowNull: false,
         type: Sequelize.FLOAT
