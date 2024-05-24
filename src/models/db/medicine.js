@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     composition: DataTypes.TEXT,
     dose: DataTypes.TEXT,
     usage: DataTypes.TEXT,
-    sideEffects: DataTypes.TEXT,
+    sideEffect: DataTypes.TEXT,
     price: DataTypes.FLOAT,
     categoryId: DataTypes.INTEGER,
     stock: DataTypes.INTEGER,

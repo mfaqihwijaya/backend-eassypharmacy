@@ -31,7 +31,7 @@ module.exports = {
       usage: {
         type: Sequelize.TEXT
       },
-      sideEffects: {
+      sideEffect: {
         type: Sequelize.TEXT
       },
       price: {
