@@ -12,12 +12,14 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Medicine.hasMany(models.MedicineOrder, { foreignKey: 'medicineId' });
+      Medicine.belongsTo(models.MedicineCategory, { foreignKey: 'categoryId' });
     }
   }
   Medicine.init({
     name: DataTypes.STRING,
     description: DataTypes.STRING,
     price: DataTypes.FLOAT,
+    categoryId: DataTypes.INTEGER,
     stock: DataTypes.INTEGER,
     image: DataTypes.STRING,
     category: DataTypes.STRING
