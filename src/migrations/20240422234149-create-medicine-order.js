@@ -23,6 +23,13 @@ module.exports = {
         }, key: 'id' },
         type: Sequelize.INTEGER
       },
+      orderId: {
+        allowNull: true,
+        references: { model: {
+          tableName: 'Orders',
+        }, key: 'id' },
+        type: Sequelize.INTEGER
+      },
       count: {
         type: Sequelize.INTEGER
       },

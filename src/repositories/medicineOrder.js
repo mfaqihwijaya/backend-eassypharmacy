@@ -14,7 +14,7 @@ class MedicineOrderPostgres {
     async getMedicineOrders(userId) {
         try {
             const medicineOrders = await this.MedicineOrder.findAll({
-                where: {userId: userId, deletedAt: null }
+                where: {userId: userId, orderId:null, deletedAt: null }
             })
             return medicineOrders
         } catch (err) {
@@ -26,6 +26,28 @@ class MedicineOrderPostgres {
         try {
             const medicineOrder = await this.MedicineOrder.findOne({ where: { id: medicineOrderId, deletedAt: null } })
             return medicineOrder
+        } catch (err) {
+            throw err;
+        }
+    }
+    async getMedicineOrderByIds(medicineOrderIds, transaction = null) {
+        try {
+            const medicineOrders = await this.MedicineOrder.findAll({ 
+                where: { id: {
+                    [Op.in]: medicineOrderIds 
+                }, orderId:null, deletedAt: null }, transaction })
+            return medicineOrders
+        } catch (err) {
+            throw err;
+        }
+    }
+    async updateMedicineOrder(medicineOrder, transaction = null) {
+        try {
+            const [affectedRows] = await this.MedicineOrder.update(medicineOrder, {
+                where: { id: medicineOrder.id },
+                transaction
+            })
+            return affectedRows;
         } catch (err) {
             throw err;
         }

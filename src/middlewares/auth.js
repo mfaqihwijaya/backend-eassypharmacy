@@ -21,6 +21,7 @@ class AuthMiddleware {
             username: Joi.string().required(),
             email: Joi.string().email().required(),
             password: Joi.string().min(5).required(),
+            address: Joi.string().required(),
             phoneNumber: Joi.string().optional(),
         })
         const { error } = schema.validate(req.body);

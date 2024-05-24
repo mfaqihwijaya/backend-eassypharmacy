@@ -18,6 +18,7 @@ module.exports = {
         email: 'username1@example.com',
         password: 'username1pass123',
         phoneNumber: '09123456789',
+        address: "Yogyakarta",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -26,6 +27,7 @@ module.exports = {
         email: 'username2@example.com',
         password: 'username2pass123',
         phoneNumber: '08122456689',
+        address: "Palangkaraya",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -34,25 +36,10 @@ module.exports = {
         email: 'username3@example.com',
         password: 'username3pass123',
         phoneNumber: '08123456789',
+        address: "Riau",
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-      {
-        username: 'username4',
-        email: 'username4@example.com',
-        password: 'username4pass123',
-        phoneNumber: '08123456789',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        username: 'username5',
-        email: 'username5@example.com',
-        password: 'username5pass123',
-        phoneNumber: '08123456789',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }
     ]);
   },
 

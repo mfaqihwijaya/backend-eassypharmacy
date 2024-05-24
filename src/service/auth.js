@@ -9,6 +9,7 @@ class AuthService {
     }
     async userRegister(user) {
         try {
+            console.log('faqih', user);
             const emailExist = await this.userRepo.getUserByEmail(user.email)
             const usernameExist = await this.userRepo.getUserByUsername(user.username)
             if (emailExist) {
@@ -24,7 +25,11 @@ class AuthService {
             const hashedPassword = await this.hashPassword(user.password)
             user.password = hashedPassword
             await this.userRepo.createUser(user)
-            return user
+            const newUser = {
+                username: user.username,
+                email: user.email
+            }
+            return newUser
         } catch (err) {
             throw err;
         }
