@@ -24,6 +24,10 @@ const { OrderPostgres } = require("./src/repositories/order");
 const { OrderService } = require("./src/service/order");
 const { OrderController } = require("./src/controller/order");
 const { OrderRouter } = require("./src/router/order");
+const { MedicineCategoryService } = require("./src/service/medicineCategory");
+const { MedicineCategoryController } = require("./src/controller/medicineCategory");
+const { MedicineCategoryRouter } = require("./src/router/medicineCategory");
+const { MedicineCategoryPostgres } = require("./src/repositories/medicineCategory");
 
 
 async function serveBackend() {
@@ -68,6 +72,10 @@ async function prepare() {
   const orderService = new OrderService(orderRepo, userRepo, medicineOrderRepo, medicineRepo);
   const orderController = new OrderController(orderService);
 
+  const medicineCategoryRepo = new MedicineCategoryPostgres(db);
+  const medicineCategoryService = new MedicineCategoryService(medicineCategoryRepo);
+  const medicineCategoryController = new MedicineCategoryController(medicineCategoryService);
+
   // middleware
   const jwtMiddleware = new JWTMiddleware(authService);
   const authMiddleware = new AuthMiddleware();
@@ -83,6 +91,7 @@ async function prepare() {
     medicineOrderController
   );
   const orderRouter = new OrderRouter(app, jwtMiddleware, orderController);
+  const medicineCategoryRouter = new MedicineCategoryRouter(app, medicineCategoryController);
   
   // mount all 
   authRouter.mountV1();
@@ -90,6 +99,7 @@ async function prepare() {
   medicineRouter.mountV1();
   medicineOrderRouter.mountV1();
   orderRouter.mountV1();
+  medicineCategoryRouter.mountV1();
 
   return app;
 }

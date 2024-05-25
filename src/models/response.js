@@ -13,6 +13,8 @@ const SuccessMessage = {
 
     "ORDER_FETCHED": "order data successfully fetched",
     "ORDER_UPDATED": "order data succesfully updated",
+
+    "CATEGORY_FETCHED": "category data successfully fetched",
 }
 
 const ErrorType = {
@@ -25,6 +27,7 @@ const ErrorType = {
     "ERROR_USER_LOGIN": "error logging in user",
     "ERROR_ORDER_FETCH": "error fetching order data",
     "ERROR_ORDER_UPDATE": "error updating order data",
+    "ERROR_CATEGORY_FETCH": "error fetching category data",
 }
 
 const ErrorMessage = {
