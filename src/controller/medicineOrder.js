@@ -42,6 +42,18 @@ class MedicineOrderController {
             res.status(err.status? err.status: 500).send(errs)
         }
     }
+    async deleteMedicineOrder(req, res) {
+        try {
+            const { medicineOrderId } = req.params
+            const { userId } = req
+            const affectedRows = await this.medicineOrderService.deleteMedicineOrder(medicineOrderId, userId)
+            const response = new SuccessResponse(SuccessMessage.MEDICINE_ORDER_CANCELLED, { affectedRows })
+            res.status(200).send(response)
+        } catch (err) {
+            const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_ORDER_CANCEL, err.message)]
+            res.status(err.status? err.status: 500).send(errs)
+        }
+    }
 }
 
 module.exports = { MedicineOrderController }

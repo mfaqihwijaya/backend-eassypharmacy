@@ -23,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     paidAt: DataTypes.DATE,
   }, {
     sequelize,
+    paranoid: true,
     modelName: 'Order',
   });
   return Order;

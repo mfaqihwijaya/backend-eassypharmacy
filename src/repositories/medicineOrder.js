@@ -24,9 +24,12 @@ class MedicineOrderPostgres {
         }
     }
 
-    async getMedicineOrderById(medicineOrderId) {
+    async getMedicineOrderById(medicineOrderId, transaction = null) {
         try {
-            const medicineOrder = await this.MedicineOrder.findOne({ where: { id: medicineOrderId, deletedAt: null } })
+            const medicineOrder = await this.MedicineOrder.findOne({ 
+                where: { id: medicineOrderId, deletedAt: null }, 
+                transaction 
+            })
             return medicineOrder
         } catch (err) {
             throw err;
@@ -47,6 +50,17 @@ class MedicineOrderPostgres {
         try {
             const [affectedRows] = await this.MedicineOrder.update(medicineOrder, {
                 where: { id: medicineOrder.id },
+                transaction
+            })
+            return affectedRows;
+        } catch (err) {
+            throw err;
+        }
+    }
+    async deleteMedicineOrder(medicineOrderId, transaction = null) {
+        try {
+            const affectedRows = await this.MedicineOrder.destroy({
+                where: { id: medicineOrderId },
                 transaction
             })
             return affectedRows;

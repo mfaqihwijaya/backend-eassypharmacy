@@ -79,6 +79,27 @@ class MedicineOrderService {
             throw error
         }
     }
+    async deleteMedicineOrder(medicineOrderId, userId) {
+        try {
+            const affectedRows = await sequelize.transaction(async (t) => {
+                const medicineOrder = await this.medicineOrderRepo.getMedicineOrderById(medicineOrderId, t);
+                if (!medicineOrder) {
+                    const error = new Error(ErrorMessage.ERROR_MEDICINE_ORDER_NOT_FOUND)
+                    error.status = 404
+                    throw error
+                }
+                if (medicineOrder.userId != userId) {
+                    const error = new Error(ErrorMessage.ERROR_RESTRICTED_ACCESS)
+                    error.status = 403
+                    throw error
+                }
+                return await this.medicineOrderRepo.deleteMedicineOrder(medicineOrderId, t);
+            })
+            return affectedRows
+        } catch (error) {
+            throw error
+        }
+    }
 }
 
 module.exports = { MedicineOrderService }

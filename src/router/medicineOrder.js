@@ -42,6 +42,14 @@ class MedicineOrderRouter {
                 this.medicineOrderController.getMedicineOrderById(req, res)
             }
         )
+        medicineOrderId.delete(
+            async (req, res, next) => {
+                this.jwtMiddleware.authenticate(req, res, next);
+            },
+            async (req, res) => {
+                this.medicineOrderController.deleteMedicineOrder(req, res)
+            }
+        )
     }
 }
 
