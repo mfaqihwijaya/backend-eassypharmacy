@@ -3,15 +3,9 @@ class UserPostgres {
         this.User = db.User;
     }
 
-    async createUser(user) {
+    async createUser(user, transaction = null) {
         try {
-            await this.User.create({
-                username: user.username,
-                email: user.email,
-                phoneNumber: user.phoneNumber,
-                address: user.address,
-                password: user.password,
-            })
+            await this.User.create(user, { transaction })
         } catch (err) {
             throw err;
         }
@@ -26,17 +20,17 @@ class UserPostgres {
         }
     }
 
-    async getUserByEmail(email) {
+    async getUserByEmail(email, transaction = null) {
         try {
-            const user = await this.User.findOne({ where: { email: email, deletedAt: null } })
+            const user = await this.User.findOne({ where: { email: email, deletedAt: null }, transaction })
             return user
         } catch (err) {
             throw err
         }
     }
-    async getUserByUsername(username) {
+    async getUserByUsername(username, transaction = null) {
         try {
-            const user = await this.User.findOne({ where: { username: username, deletedAt: null } })
+            const user = await this.User.findOne({ where: { username: username, deletedAt: null }, transaction })
             return user
         } catch (err) {
             throw err
