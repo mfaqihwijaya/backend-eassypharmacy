@@ -13,7 +13,8 @@ class UserPostgres {
 
     async getUserById(userId, transaction = null) {
         try {
-            const user = await this.User.findOne({ where: { id: userId, deletedAt: null }, transaction })
+            const user = await this.User.findOne({ 
+                where: { id: userId, deletedAt: null }, transaction })
             return user
         } catch (err) {
             throw err

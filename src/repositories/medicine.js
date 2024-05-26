@@ -3,9 +3,9 @@ class MedicinePostgres {
         this.Medicine = db.Medicine
     }
 
-    async countMedicines() {
+    async countMedicines(whereSearch) {
         try {
-            const count = await this.Medicine.count({ where: { deletedAt: null } })
+            const count = await this.Medicine.count({ where: { ...whereSearch, deletedAt: null } })
             return count
         } catch (err) {
             throw err;
