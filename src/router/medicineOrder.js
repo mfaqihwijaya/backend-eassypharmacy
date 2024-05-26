@@ -32,7 +32,7 @@ class MedicineOrderRouter {
             }
         )
 
-        const medicineOrdersMedicine = this.app.route(`${v1}/medicine-orders/medicines/:medicineId`)
+        const medicineOrdersMedicine = this.app.route(`${v1}/medicine-orders/medicines/:medicineId/check`)
         medicineOrdersMedicine.get(
             async (req, res, next) => {
                 this.jwtMiddleware.authenticate(req, res, next);
@@ -55,6 +55,9 @@ class MedicineOrderRouter {
         medicineOrderId.put(
             async (req, res, next) => {
                 this.jwtMiddleware.authenticate(req, res, next);
+            },
+            async (req, res) => {
+                this.medicineOrderMiddleware.validateUpdateMedicineOrderParams(req, res, next)
             },
             async (req, res) => {
                 this.medicineOrderController.updateMedicineOrderQuantity(req, res)

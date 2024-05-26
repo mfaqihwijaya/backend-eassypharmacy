@@ -11,10 +11,10 @@ class MedicineOrderController {
             const payload = {userId, ...req.body}
             const newMedicineOrder = await this.medicineOrderService.createMedicineOrder(payload)
             const response = new SuccessResponse(SuccessMessage.MEDICINE_ORDER_CREATED, newMedicineOrder)
-            res.status(201).send(response)
+            res.status(RESPONSE_STATUS_CODE.CREATED).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_ORDER_CREATION, err.message)]
-            res.status(err.status? err.status: 500).send(errs)
+            res.status(err.status? err.status: RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR).send(errs)
         }
     }
 
@@ -24,10 +24,10 @@ class MedicineOrderController {
             const { userId } = req
             const medicineOrder = await this.medicineOrderService.getMedicineOrderById(medicineOrderId, userId)
             const response = new SuccessResponse(SuccessMessage.MEDICINE_ORDER_FETCHED, medicineOrder)
-            res.status(200).send(response)
+            res.status(RESPONSE_STATUS_CODE.OK).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_ORDER_FETCH, err.message)]
-            res.status(err.status? err.status: 500).send(errs)
+            res.status(err.status? err.status: RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR).send(errs)
         }
     }
 
@@ -39,7 +39,7 @@ class MedicineOrderController {
             res.status(RESPONSE_STATUS_CODE.OK).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_ORDER_FETCH, err.message)]
-            res.status(err.status? err.status: 500).send(errs)
+            res.status(err.status? err.status: RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR).send(errs)
         }
     }
     async deleteMedicineOrder(req, res) {
@@ -48,10 +48,10 @@ class MedicineOrderController {
             const { userId } = req
             const affectedRows = await this.medicineOrderService.deleteMedicineOrder(medicineOrderId, userId)
             const response = new SuccessResponse(SuccessMessage.MEDICINE_ORDER_CANCELLED, { affectedRows })
-            res.status(200).send(response)
+            res.status(RESPONSE_STATUS_CODE.OK).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_ORDER_CANCEL, err.message)]
-            res.status(err.status? err.status: 500).send(errs)
+            res.status(err.status? err.status: RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR).send(errs)
         }
     }
     async updateMedicineOrderQuantity(req, res) {
@@ -61,10 +61,10 @@ class MedicineOrderController {
             const { userId } = req
             const updatedMedicineOrder = await this.medicineOrderService.updateMedicineOrderQuantity(medicineOrderId, userId, quantity)
             const response = new SuccessResponse(SuccessMessage.MEDICINE_ORDER_UPDATED, updatedMedicineOrder)
-            res.status(200).send(response)
+            res.status(RESPONSE_STATUS_CODE.OK).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_ORDER_UPDATE, err.message)]
-            res.status(err.status? err.status: 500).send(errs)
+            res.status(err.status? err.status: RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR).send(errs)
         }
     }
     async checkMedicineInCart(req, res) {
