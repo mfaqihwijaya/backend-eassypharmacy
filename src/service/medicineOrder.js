@@ -1,5 +1,6 @@
 const { sequelize } = require("../models/db");
 const { ErrorMessage } = require("../models/response");
+const { RESPONSE_STATUS_CODE } = require("../util/constants");
 
 class MedicineOrderService {
     constructor(medicineOrderRepo, medicineRepo, userRepo) {
@@ -56,7 +57,7 @@ class MedicineOrderService {
             const user = await this.userRepo.getUserById(userId);
             if (!user) {
                 const error = new Error(ErrorMessage.ERROR_USER_NOT_FOUND);
-                error.status = 404;
+                error.status = RESPONSE_STATUS_CODE.NOT_FOUND;
                 throw error;
             }
             const medicineOrders = await this.medicineOrderRepo.getMedicineOrders(userId);
@@ -87,12 +88,11 @@ class MedicineOrderService {
 
     async checkMedicineAlreadyInCart(userId, medicineId) {
         try {
-            const medicineOrders = await this.medicineOrderRepo.getMedicineOrders(userId);
-            const filteredMedicineOrders = medicineOrders.filter(medicineOrder => medicineOrder.medicineId == medicineId);
-            if (filteredMedicineOrders.length > 0) {
-                return true
+            const medicineOrder = await this.medicineOrderRepo.getMedicineOrderByMedicineId(userId, medicineId);
+            if(!medicineOrder) {
+                return false
             }
-            return false
+            return true
         } catch (error) {
             throw error
         }

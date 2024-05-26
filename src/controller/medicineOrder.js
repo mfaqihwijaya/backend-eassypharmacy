@@ -1,5 +1,5 @@
 const { SuccessMessage, ErrorResponse, ErrorMessage, SuccessResponse, ErrorType } = require("../models/response");
-
+const { RESPONSE_STATUS_CODE } = require("../util/constants");
 class MedicineOrderController {
     constructor(medicineOrderService) {
         this.medicineOrderService = medicineOrderService
@@ -36,7 +36,7 @@ class MedicineOrderController {
             const { userId } = req
             const medicineOrders = await this.medicineOrderService.getMedicineOrders(userId)
             const response = new SuccessResponse(SuccessMessage.MEDICINE_ORDER_FETCHED, medicineOrders)
-            res.status(200).send(response)
+            res.status(RESPONSE_STATUS_CODE.OK).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_ORDER_FETCH, err.message)]
             res.status(err.status? err.status: 500).send(errs)
@@ -73,10 +73,10 @@ class MedicineOrderController {
             const { medicineId } = req.params
             const isInCart = await this.medicineOrderService.checkMedicineAlreadyInCart(userId, medicineId)
             const response = new SuccessResponse(SuccessMessage.MEDICINE_FETCHED, isInCart)
-            res.status(200).send(response)
+            res.status(RESPONSE_STATUS_CODE.OK).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_FETCH, err.message)]
-            res.status(err.status? err.status: 500).send(errs)
+            res.status(err.status? err.status: RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR).send(errs)
         }
     }
 }

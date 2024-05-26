@@ -32,7 +32,7 @@ class MedicineOrderRouter {
             }
         )
 
-        const medicineOrdersMedicine = this.app.route(`${v1}/medicine-orders/:medicineId`)
+        const medicineOrdersMedicine = this.app.route(`${v1}/medicine-orders/medicines/:medicineId`)
         medicineOrdersMedicine.get(
             async (req, res, next) => {
                 this.jwtMiddleware.authenticate(req, res, next);
