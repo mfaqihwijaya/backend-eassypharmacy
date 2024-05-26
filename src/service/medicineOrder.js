@@ -25,13 +25,18 @@ class MedicineOrderService {
                     error.status = 404;
                     throw error;
                 }
+                const isMedicineAlreadyInCart = await this.checkMedicineAlreadyInCart(userId, medicineId);
+                if (isMedicineAlreadyInCart) {
+                    const error = new Error(ErrorMessage.ERROR_MEDICINE_ORDER_ALREADY_EXIST);
+                    error.status = 400;
+                    throw error;
+                }
                 // check medicine stock
                 if(count > medicine.stock) {   
                     const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_ENOUGH);
-                    error.status = 500;
+                    error.status = 400;
                     throw error;
                 }
-                // create order
                 const subTotal = count * medicine.price;
                 const newMedicineOrder = {
                     ...medicineOrder,
@@ -75,6 +80,19 @@ class MedicineOrderService {
                 throw error
             }
             return medicineOrder
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async checkMedicineAlreadyInCart(userId, medicineId) {
+        try {
+            const medicineOrders = await this.medicineOrderRepo.getMedicineOrders(userId);
+            const filteredMedicineOrders = medicineOrders.filter(medicineOrder => medicineOrder.medicineId == medicineId);
+            if (filteredMedicineOrders.length > 0) {
+                return true
+            }
+            return false
         } catch (error) {
             throw error
         }

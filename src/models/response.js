@@ -61,6 +61,7 @@ const ErrorMessage = {
     "ERROR_MEDICINE_ORDER_UPDATE": "error updating medicine order, please try again",
     "ERROR_MEDICINE_ORDER_FETCH": "error fetching medicine order data, please try again",
     "ERROR_MEDICINE_ORDER_NOT_FOUND": "error medicine order not found in system",
+    "ERROR_MEDICINE_ORDER_ALREADY_EXIST": "error this medicine is already exist in your cart",
     "ERROR_INVALID_MEDICINE_ORDER_ID": "invalid medicine order id",
 
     "ERROR_ORDER_NOT_FOUND": "error order not found in system",

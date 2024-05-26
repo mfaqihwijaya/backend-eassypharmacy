@@ -67,6 +67,18 @@ class MedicineOrderController {
             res.status(err.status? err.status: 500).send(errs)
         }
     }
+    async checkMedicineInCart(req, res) {
+        try {
+            const { userId } = req
+            const { medicineId } = req.params
+            const isInCart = await this.medicineOrderService.checkMedicineAlreadyInCart(userId, medicineId)
+            const response = new SuccessResponse(SuccessMessage.MEDICINE_FETCHED, isInCart)
+            res.status(200).send(response)
+        } catch (err) {
+            const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_FETCH, err.message)]
+            res.status(err.status? err.status: 500).send(errs)
+        }
+    }
 }
 
 module.exports = { MedicineOrderController }
