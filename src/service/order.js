@@ -1,5 +1,6 @@
 const { sequelize } = require("../models/db");
 const { ErrorMessage } = require("../models/response");
+const { ORDER_STATUS } = require("../util/constants");
 
 class OrderService {
     constructor(orderRepo, userRepo, medicineOrderRepo, medicineRepo) {
@@ -47,6 +48,63 @@ class OrderService {
             };
             const affectedRows = await this.orderRepo.updateOrder(orderId, userId, updateData);
             return affectedRows
+        } catch (error) {
+            throw error
+        }
+    }
+    async cancelOrder(orderId, userId) {
+        try {
+            const cancelledOrder = await sequelize.transaction(async (t) => {
+                // check user is exist
+                const user = await this.userRepo.getUserById(userId, t);
+                if (!user) {
+                    const error = new Error(ErrorMessage.ERROR_USER_NOT_FOUND);
+                    error.status = 404;
+                    throw error;
+                }
+                // check order is exist waiting & match user
+                const order = await this.orderRepo.getOrderById(orderId, t);
+                if (!order) {
+                    const error = new Error(ErrorMessage.ERROR_ORDER_NOT_FOUND);
+                    error.status = 404;
+                    throw error;
+                }
+                if(order.status != ORDER_STATUS.WAITING) {
+                    const error = new Error(ErrorMessage.ERROR_ORDER_CANCEL);
+                    error.status = 500;
+                    throw error;
+                }
+                if (order.userId != userId) {
+                    const error = new Error(ErrorMessage.ERROR_RESTRICTED_ACCESS);
+                    error.status = 403;
+                    throw error;
+                }
+                // restore medicine stock based on corresponding order
+                const medicineOrders = await this.medicineOrderRepo.getMedicineOrderByOrderId(orderId, t);
+                for (const medicineOrder of medicineOrders) {
+                    const { medicineId, count } = medicineOrder;
+                    const medicine = await this.medicineRepo.getMedicineById(medicineId, t);
+                    if (!medicine) {
+                        const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_FOUND);
+                        error.status = 404;
+                        throw error;
+                    }
+                    const restoreMedicinStock = {
+                        id: medicine.id,
+                        stock: medicine.stock + count
+                    }
+                    await this.medicineRepo.updateMedicine(restoreMedicinStock, t);
+                }
+                // cancel order
+                const cancelOrderData = {
+                    id: orderId,
+                    userId,
+                    status: ORDER_STATUS.CANCELLED
+                };
+                await this.orderRepo.updateOrder(orderId, userId, cancelOrderData, t);
+                return cancelOrderData;
+            })
+            return cancelledOrder;
         } catch (error) {
             throw error
         }

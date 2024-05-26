@@ -35,6 +35,17 @@ class MedicineOrderPostgres {
             throw err;
         }
     }
+    async getMedicineOrderByOrderId(orderId, transaction = null) {
+        try {
+            const medicineOrders = await this.MedicineOrder.findAll({ 
+                where: { orderId: orderId, deletedAt: null }, 
+                transaction 
+            })
+            return medicineOrders
+        } catch (err) {
+            throw err;
+        }
+    }
     async getMedicineOrderByIds(medicineOrderIds, transaction = null) {
         try {
             const medicineOrders = await this.MedicineOrder.findAll({ 

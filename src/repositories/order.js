@@ -10,6 +10,8 @@ class OrderPostgres {
             throw err;
         }
     }
+    // TODO jadikan bisa filter by status, default no filter by status
+    // TODO order by created at
     async getOrders(userId, transaction = null) {
         try {
             const orders = await this.Order.findAll({

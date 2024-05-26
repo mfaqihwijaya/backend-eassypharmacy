@@ -46,6 +46,16 @@ class OrderRouter {
                 this.orderController.updateOrderAddress(req, res)
             }
         )
+
+        const cancelOrder = this.app.route(`${v1}/orders/:orderId/cancel`)
+        cancelOrder.put(
+            async (req, res, next) => {
+                this.jwtMiddleware.authenticate(req, res, next);
+            },
+            async (req, res) => {
+                this.orderController.cancelOrder(req, res)
+            }
+        )
     }
 }
 

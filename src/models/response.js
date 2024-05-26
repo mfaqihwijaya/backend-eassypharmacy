@@ -14,6 +14,7 @@ const SuccessMessage = {
 
     "ORDER_FETCHED": "order data successfully fetched",
     "ORDER_UPDATED": "order data succesfully updated",
+    "ORDER_CANCELLED": "order data succesfully cancelled",
 
     "CATEGORY_FETCHED": "category data successfully fetched",
 }
@@ -30,6 +31,7 @@ const ErrorType = {
     "ERROR_USER_LOGIN": "error logging in user",
     "ERROR_ORDER_FETCH": "error fetching order data",
     "ERROR_ORDER_UPDATE": "error updating order data",
+    "ERROR_ORDER_CANCEL": "error canceling order data",
     "ERROR_CATEGORY_FETCH": "error fetching category data",
 }
 
@@ -61,6 +63,7 @@ const ErrorMessage = {
     "ERROR_INVALID_MEDICINE_ORDER_ID": "invalid medicine order id",
 
     "ERROR_ORDER_NOT_FOUND": "error order not found in system",
+    "ERROR_ORDER_CANCEL": "error order is already cancelled or paid",
 
     "ERROR_RESTRICTED_ACCESS": "user doesn't have an access",
 }

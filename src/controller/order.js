@@ -51,6 +51,18 @@ class OrderController {
             res.status(err.status? err.status: 500).send(errs)
         }
     }
+    async cancelOrder(req, res) {
+        try {
+            const { orderId } = req.params
+            const { userId } = req
+            const affectedRows = await this.orderService.cancelOrder(orderId, userId)
+            const response = new SuccessResponse(SuccessMessage.ORDER_CANCELLED, { affectedRows })
+            res.status(200).send(response)
+        } catch (err) {
+            const errs = [new ErrorResponse(ErrorType.ERROR_ORDER_CANCEL, err.message)]
+            res.status(err.status? err.status: 500).send(errs)
+        }
+    }
 }
 
 module.exports = { OrderController }
