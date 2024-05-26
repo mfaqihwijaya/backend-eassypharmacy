@@ -32,6 +32,7 @@ const ErrorType = {
     "ERROR_ORDER_FETCH": "error fetching order data",
     "ERROR_ORDER_UPDATE": "error updating order data",
     "ERROR_ORDER_CANCEL": "error canceling order data",
+    "ERROR_ORDER_CHECKOUT": "error checking out order",
     "ERROR_CATEGORY_FETCH": "error fetching category data",
 }
 
@@ -63,7 +64,7 @@ const ErrorMessage = {
     "ERROR_INVALID_MEDICINE_ORDER_ID": "invalid medicine order id",
 
     "ERROR_ORDER_NOT_FOUND": "error order not found in system",
-    "ERROR_ORDER_CANCEL": "error order is already cancelled or paid",
+    "ERROR_ORDER_NOT_WAITING": "error order is already cancelled or paid",
 
     "ERROR_RESTRICTED_ACCESS": "user doesn't have an access",
 }

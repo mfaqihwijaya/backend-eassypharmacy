@@ -43,11 +43,37 @@ class OrderService {
     }
     async updateOrderAddress(userId, orderId, address) {
         try {
-            const updateData = {
-                address
-            };
-            const affectedRows = await this.orderRepo.updateOrder(orderId, userId, updateData);
-            return affectedRows
+            const affectedRows = await sequelize.transaction(async (t) => {
+                // check user is exist
+                const user = await this.userRepo.getUserById(userId);
+                if (!user) {
+                    const error = new Error(ErrorMessage.ERROR_USER_NOT_FOUND);
+                    error.status = 404;
+                    throw error;
+                }
+                // check order is exist waiting & match user
+                const order = await this.orderRepo.getOrderById(orderId);
+                if (!order) {
+                    const error = new Error(ErrorMessage.ERROR_ORDER_NOT_FOUND);
+                    error.status = 404;
+                    throw error;
+                }
+                if(order.status != ORDER_STATUS.WAITING) {
+                    const error = new Error(ErrorMessage.ERROR_ORDER_NOT_WAITING);
+                    error.status = 500;
+                    throw error;
+                }
+                if (order.userId != userId) {
+                    const error = new Error(ErrorMessage.ERROR_RESTRICTED_ACCESS);
+                    error.status = 403;
+                    throw error;
+                }
+                const updateData = {
+                    address
+                };
+                return await this.orderRepo.updateOrder(orderId, updateData);
+            })
+            return affectedRows;
         } catch (error) {
             throw error
         }
@@ -70,7 +96,7 @@ class OrderService {
                     throw error;
                 }
                 if(order.status != ORDER_STATUS.WAITING) {
-                    const error = new Error(ErrorMessage.ERROR_ORDER_CANCEL);
+                    const error = new Error(ErrorMessage.ERROR_ORDER_NOT_WAITING);
                     error.status = 500;
                     throw error;
                 }
@@ -89,11 +115,11 @@ class OrderService {
                         error.status = 404;
                         throw error;
                     }
-                    const restoreMedicinStock = {
+                    const restoreMedicineStock = {
                         id: medicine.id,
                         stock: medicine.stock + count
                     }
-                    await this.medicineRepo.updateMedicine(restoreMedicinStock, t);
+                    await this.medicineRepo.updateMedicine(restoreMedicineStock, t);
                 }
                 // cancel order
                 const cancelOrderData = {
@@ -101,7 +127,7 @@ class OrderService {
                     userId,
                     status: ORDER_STATUS.CANCELLED
                 };
-                await this.orderRepo.updateOrder(orderId, userId, cancelOrderData, t);
+                await this.orderRepo.updateOrder(orderId, cancelOrderData, t);
                 return cancelOrderData;
             })
             return cancelledOrder;
@@ -120,7 +146,7 @@ class OrderService {
             }
             const result = await sequelize.transaction(async (t) => {
                 const medicineOrders = await this.medicineOrderRepo.getMedicineOrderByIds(medicineOrderIds, t);
-                if(medicineOrders.length == 0) {
+                if(medicineOrders.length != medicineOrderIds.length) {
                     const error = new Error(ErrorMessage.ERROR_MEDICINE_ORDER_NOT_FOUND);
                     error.status = 404;
                     throw error

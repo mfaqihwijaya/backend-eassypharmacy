@@ -36,10 +36,10 @@ class OrderPostgres {
         }
     }
 
-    async updateOrder(orderId, userId, order, transaction = null) {
+    async updateOrder(orderId, order, transaction = null) {
         try {
             const [affectedRows] = await this.Order.update(order, {
-                 where: { id: orderId, userId},
+                 where: { id: orderId},
                  transaction
             })
             return affectedRows;
