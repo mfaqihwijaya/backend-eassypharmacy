@@ -1,4 +1,5 @@
 const { SuccessMessage, ErrorResponse, ErrorMessage, SuccessResponse, ErrorType } = require("../models/response");
+const { RESPONSE_STATUS_CODE } = require("../util/constants");
 
 class MedicineCategoryController {
     constructor(medicineCategoryService) {
@@ -8,10 +9,10 @@ class MedicineCategoryController {
         try {
             const categories = await this.medicineCategoryService.getCategories()
             const response = new SuccessResponse(SuccessMessage.CATEGORY_FETCHED, categories)
-            res.status(200).send(response)
+            res.status(RESPONSE_STATUS_CODE.OK).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_CATEGORY_FETCH, err.message)]
-            res.status(err.status? err.status: 500).send(errs)
+            res.status(err.status? err.status: RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR).send(errs)
         }
     }
 }

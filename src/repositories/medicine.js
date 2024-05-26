@@ -1,6 +1,7 @@
 class MedicinePostgres {
     constructor(db) {
         this.Medicine = db.Medicine
+        this.MedicineCategory = db.MedicineCategory
     }
 
     async countMedicines(whereSearch) {
@@ -16,9 +17,16 @@ class MedicinePostgres {
         try {
             const medicines = await this.Medicine.findAll({
                 where: { ...whereSearch, deletedAt: null },
+                attributes: { exclude: ['createdAt','updatedAt','deletedAt','categoryId'] },
                 limit,
                 offset,
-                order
+                order,
+                include: [
+                    {
+                        model: this.MedicineCategory,
+                        attributes: ['id', 'name']
+                    }
+                ]
             })
             return medicines
         } catch (err) {

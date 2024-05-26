@@ -23,16 +23,13 @@ class MedicineService {
             const order = [[column, orderType]]
             const medicines = await this.medicineRepo.getMedicines(whereSearch, limit, offset, order);  
             // remove unnecessary field
-            const returnMedicines = medicines.map(medicine => {
-                const { createdAt, updatedAt, deletedAt, ...rest } = medicine.dataValues
-                return rest
-            })
             const countData = await this.medicineRepo.countMedicines(whereSearch)
             const paginatedData = {
-                medicines: returnMedicines,
+                medicines,
                 pagination: {
                     totalData: countData,
                     currentPage: page,
+                    pageSize: count,
                     totalPage: Math.ceil(countData / count),
                 }
             }
