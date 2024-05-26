@@ -54,6 +54,19 @@ class MedicineOrderController {
             res.status(err.status? err.status: 500).send(errs)
         }
     }
+    async updateMedicineOrderQuantity(req, res) {
+        try {
+            const { medicineOrderId } = req.params
+            const { quantity } = req.body
+            const { userId } = req
+            const updatedMedicineOrder = await this.medicineOrderService.updateMedicineOrderQuantity(medicineOrderId, userId, quantity)
+            const response = new SuccessResponse(SuccessMessage.MEDICINE_ORDER_UPDATED, updatedMedicineOrder)
+            res.status(200).send(response)
+        } catch (err) {
+            const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_ORDER_UPDATE, err.message)]
+            res.status(err.status? err.status: 500).send(errs)
+        }
+    }
 }
 
 module.exports = { MedicineOrderController }

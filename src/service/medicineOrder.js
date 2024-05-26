@@ -79,6 +79,46 @@ class MedicineOrderService {
             throw error
         }
     }
+    async updateMedicineOrderQuantity(medicineOrderId, userId, quantity) {
+        try {
+            const result = await sequelize.transaction(async (t) => {
+                const medicineOrder = await this.medicineOrderRepo.getMedicineOrderById(medicineOrderId);
+                if (!medicineOrder) {
+                    const error = new Error(ErrorMessage.ERROR_MEDICINE_ORDER_NOT_FOUND)
+                    error.status = 404
+                    throw error
+                }
+                if (medicineOrder.userId != userId) {
+                    const error = new Error(ErrorMessage.ERROR_RESTRICTED_ACCESS)
+                    error.status = 403
+                    throw error
+                }
+                const medicine = await this.medicineRepo.getMedicineById(medicineOrder.medicineId, t);
+                if (!medicine) {
+                    const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_FOUND)
+                    error.status = 404
+                    throw error
+                }
+                if(quantity > medicine.stock) {
+                    const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_ENOUGH)
+                    error.status = 500
+                    throw error
+                }
+                const subTotal = quantity * medicine.price
+                const updateData = {
+                    id: medicineOrderId,
+                    medicineId: medicine.id,
+                    count: quantity,
+                    subTotal,
+                }
+                await this.medicineOrderRepo.updateMedicineOrder(updateData, t);
+                return updateData
+            })
+            return result
+        } catch (error) {
+            throw error
+        }
+    }
     async deleteMedicineOrder(medicineOrderId, userId) {
         try {
             const affectedRows = await sequelize.transaction(async (t) => {
