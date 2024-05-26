@@ -10,9 +10,13 @@ const SuccessMessage = {
     "MEDICINE_ORDER_CREATED": "medicine order data successfully created",
     "MEDICINE_ORDER_FETCHED": "medicine order data successfully fetched",
     "MEDICINE_ORDER_UPDATED": "medicine order data succesfully updated",
+    "MEDICINE_ORDER_CANCELLED": "medicine order data succesfully cancelled",
 
     "ORDER_FETCHED": "order data successfully fetched",
     "ORDER_UPDATED": "order data succesfully updated",
+    "ORDER_CANCELLED": "order data succesfully cancelled",
+
+    "CATEGORY_FETCHED": "category data successfully fetched",
 }
 
 const ErrorType = {
@@ -21,10 +25,15 @@ const ErrorType = {
     "ERROR_USER_AUTHENTICATION": "error authenticating user",
     "ERROR_USER_FETCH": "error fetching user data",
     "ERROR_MEDICINE_ORDER_FETCH": "error fetching medicine order data",
+    "ERROR_MEDICINE_ORDER_UPDATE": "error updating medicine order data",
+    "ERROR_MEDICINE_ORDER_CANCEL": "error canceling medicine order data",
     "ERROR_USER_REGISTER": "error creating user",
     "ERROR_USER_LOGIN": "error logging in user",
     "ERROR_ORDER_FETCH": "error fetching order data",
     "ERROR_ORDER_UPDATE": "error updating order data",
+    "ERROR_ORDER_CANCEL": "error canceling order data",
+    "ERROR_ORDER_CHECKOUT": "error checking out order",
+    "ERROR_CATEGORY_FETCH": "error fetching category data",
 }
 
 const ErrorMessage = {
@@ -52,9 +61,11 @@ const ErrorMessage = {
     "ERROR_MEDICINE_ORDER_UPDATE": "error updating medicine order, please try again",
     "ERROR_MEDICINE_ORDER_FETCH": "error fetching medicine order data, please try again",
     "ERROR_MEDICINE_ORDER_NOT_FOUND": "error medicine order not found in system",
+    "ERROR_MEDICINE_ORDER_ALREADY_EXIST": "error this medicine is already exist in your cart",
     "ERROR_INVALID_MEDICINE_ORDER_ID": "invalid medicine order id",
 
     "ERROR_ORDER_NOT_FOUND": "error order not found in system",
+    "ERROR_ORDER_NOT_WAITING": "error order is already cancelled or paid",
 
     "ERROR_RESTRICTED_ACCESS": "user doesn't have an access",
 }

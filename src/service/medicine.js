@@ -8,21 +8,29 @@ class MedicineService {
 
     async getMedicines(query) {
         try {
-            const { keyword = '', count = 10, page = 1, column = 'name', orderType = 'ASC' } = query
+            const { keyword = '', count = 8, page = 1, column = 'name', orderType = 'ASC', categoryId = null } = query
             const whereSearch = {
                 name: {
                     [Sequelize.Op.iLike]: `%${keyword}%`
-                }
+                },
+            }
+            if (categoryId) {
+                whereSearch.categoryId = categoryId
             }
             const limit = count
             const offset = count * (page - 1)
             const order = [[column, orderType]]
+            const countData = await this.medicineRepo.countMedicines()
             const medicines = await this.medicineRepo.getMedicines(whereSearch, limit, offset, order);
-            return medicines;
+            const paginatedData = {
+                medicines,
+                pagination: {
+                    totalData: countData
+                }
+            }
+            return paginatedData;
         } catch (err) {
-            const error = new Error(err.message)
-            error.status = 500;
-            throw error;
+            throw err;
         }
     }
 
@@ -36,9 +44,7 @@ class MedicineService {
             }
             return medicine
         } catch (err) {
-            const error = new Error(err.message)
-            error.status = 500
-            throw error
+            throw err;
         }
     }
 }

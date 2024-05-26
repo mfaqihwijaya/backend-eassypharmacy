@@ -3,6 +3,15 @@ class MedicinePostgres {
         this.Medicine = db.Medicine
     }
 
+    async countMedicines() {
+        try {
+            const count = await this.Medicine.count({ where: { deletedAt: null } })
+            return count
+        } catch (err) {
+            throw err;
+        }
+    }
+
     async getMedicines(whereSearch, limit, offset, order) {
         try {
             const medicines = await this.Medicine.findAll({

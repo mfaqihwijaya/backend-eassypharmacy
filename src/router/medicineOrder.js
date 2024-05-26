@@ -32,6 +32,16 @@ class MedicineOrderRouter {
             }
         )
 
+        const medicineOrdersMedicine = this.app.route(`${v1}/medicine-orders/:medicineId`)
+        medicineOrdersMedicine.get(
+            async (req, res, next) => {
+                this.jwtMiddleware.authenticate(req, res, next);
+            },
+            async (req, res) => {
+                this.medicineOrderController.checkMedicineInCart(req, res)
+            }
+        )
+
         // [GET] /api/v1/medicine-orders/:medicineOrderId
         const medicineOrderId = this.app.route(`${v1}/medicine-orders/:medicineOrderId`)
         medicineOrderId.get(
@@ -40,6 +50,22 @@ class MedicineOrderRouter {
             },
             async (req, res) => {
                 this.medicineOrderController.getMedicineOrderById(req, res)
+            }
+        )
+        medicineOrderId.put(
+            async (req, res, next) => {
+                this.jwtMiddleware.authenticate(req, res, next);
+            },
+            async (req, res) => {
+                this.medicineOrderController.updateMedicineOrderQuantity(req, res)
+            }
+        )
+        medicineOrderId.delete(
+            async (req, res, next) => {
+                this.jwtMiddleware.authenticate(req, res, next);
+            },
+            async (req, res) => {
+                this.medicineOrderController.deleteMedicineOrder(req, res)
             }
         )
     }

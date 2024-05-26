@@ -24,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     subTotal: DataTypes.FLOAT
   }, {
     sequelize,
+    paranoid: true,
     modelName: 'MedicineOrder',
   });
   return MedicineOrder;

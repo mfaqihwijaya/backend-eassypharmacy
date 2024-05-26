@@ -25,13 +25,18 @@ class MedicineOrderService {
                     error.status = 404;
                     throw error;
                 }
+                const isMedicineAlreadyInCart = await this.checkMedicineAlreadyInCart(userId, medicineId);
+                if (isMedicineAlreadyInCart) {
+                    const error = new Error(ErrorMessage.ERROR_MEDICINE_ORDER_ALREADY_EXIST);
+                    error.status = 400;
+                    throw error;
+                }
                 // check medicine stock
                 if(count > medicine.stock) {   
                     const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_ENOUGH);
-                    error.status = 500;
+                    error.status = 400;
                     throw error;
                 }
-                // create order
                 const subTotal = count * medicine.price;
                 const newMedicineOrder = {
                     ...medicineOrder,
@@ -75,6 +80,80 @@ class MedicineOrderService {
                 throw error
             }
             return medicineOrder
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async checkMedicineAlreadyInCart(userId, medicineId) {
+        try {
+            const medicineOrders = await this.medicineOrderRepo.getMedicineOrders(userId);
+            const filteredMedicineOrders = medicineOrders.filter(medicineOrder => medicineOrder.medicineId == medicineId);
+            if (filteredMedicineOrders.length > 0) {
+                return true
+            }
+            return false
+        } catch (error) {
+            throw error
+        }
+    }
+    async updateMedicineOrderQuantity(medicineOrderId, userId, quantity) {
+        try {
+            const result = await sequelize.transaction(async (t) => {
+                const medicineOrder = await this.medicineOrderRepo.getMedicineOrderById(medicineOrderId);
+                if (!medicineOrder) {
+                    const error = new Error(ErrorMessage.ERROR_MEDICINE_ORDER_NOT_FOUND)
+                    error.status = 404
+                    throw error
+                }
+                if (medicineOrder.userId != userId) {
+                    const error = new Error(ErrorMessage.ERROR_RESTRICTED_ACCESS)
+                    error.status = 403
+                    throw error
+                }
+                const medicine = await this.medicineRepo.getMedicineById(medicineOrder.medicineId, t);
+                if (!medicine) {
+                    const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_FOUND)
+                    error.status = 404
+                    throw error
+                }
+                if(quantity > medicine.stock) {
+                    const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_ENOUGH)
+                    error.status = 500
+                    throw error
+                }
+                const subTotal = quantity * medicine.price
+                const updateData = {
+                    id: medicineOrderId,
+                    medicineId: medicine.id,
+                    count: quantity,
+                    subTotal,
+                }
+                await this.medicineOrderRepo.updateMedicineOrder(updateData, t);
+                return updateData
+            })
+            return result
+        } catch (error) {
+            throw error
+        }
+    }
+    async deleteMedicineOrder(medicineOrderId, userId) {
+        try {
+            const affectedRows = await sequelize.transaction(async (t) => {
+                const medicineOrder = await this.medicineOrderRepo.getMedicineOrderById(medicineOrderId, t);
+                if (!medicineOrder) {
+                    const error = new Error(ErrorMessage.ERROR_MEDICINE_ORDER_NOT_FOUND)
+                    error.status = 404
+                    throw error
+                }
+                if (medicineOrder.userId != userId) {
+                    const error = new Error(ErrorMessage.ERROR_RESTRICTED_ACCESS)
+                    error.status = 403
+                    throw error
+                }
+                return await this.medicineOrderRepo.deleteMedicineOrder(medicineOrderId, t);
+            })
+            return affectedRows
         } catch (error) {
             throw error
         }

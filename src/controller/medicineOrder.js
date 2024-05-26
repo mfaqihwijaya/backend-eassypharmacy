@@ -42,6 +42,43 @@ class MedicineOrderController {
             res.status(err.status? err.status: 500).send(errs)
         }
     }
+    async deleteMedicineOrder(req, res) {
+        try {
+            const { medicineOrderId } = req.params
+            const { userId } = req
+            const affectedRows = await this.medicineOrderService.deleteMedicineOrder(medicineOrderId, userId)
+            const response = new SuccessResponse(SuccessMessage.MEDICINE_ORDER_CANCELLED, { affectedRows })
+            res.status(200).send(response)
+        } catch (err) {
+            const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_ORDER_CANCEL, err.message)]
+            res.status(err.status? err.status: 500).send(errs)
+        }
+    }
+    async updateMedicineOrderQuantity(req, res) {
+        try {
+            const { medicineOrderId } = req.params
+            const { quantity } = req.body
+            const { userId } = req
+            const updatedMedicineOrder = await this.medicineOrderService.updateMedicineOrderQuantity(medicineOrderId, userId, quantity)
+            const response = new SuccessResponse(SuccessMessage.MEDICINE_ORDER_UPDATED, updatedMedicineOrder)
+            res.status(200).send(response)
+        } catch (err) {
+            const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_ORDER_UPDATE, err.message)]
+            res.status(err.status? err.status: 500).send(errs)
+        }
+    }
+    async checkMedicineInCart(req, res) {
+        try {
+            const { userId } = req
+            const { medicineId } = req.params
+            const isInCart = await this.medicineOrderService.checkMedicineAlreadyInCart(userId, medicineId)
+            const response = new SuccessResponse(SuccessMessage.MEDICINE_FETCHED, isInCart)
+            res.status(200).send(response)
+        } catch (err) {
+            const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_FETCH, err.message)]
+            res.status(err.status? err.status: 500).send(errs)
+        }
+    }
 }
 
 module.exports = { MedicineOrderController }

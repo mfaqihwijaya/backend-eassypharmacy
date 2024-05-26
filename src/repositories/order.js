@@ -10,6 +10,8 @@ class OrderPostgres {
             throw err;
         }
     }
+    // TODO jadikan bisa filter by status, default no filter by status
+    // TODO order by created at
     async getOrders(userId, transaction = null) {
         try {
             const orders = await this.Order.findAll({
@@ -34,10 +36,10 @@ class OrderPostgres {
         }
     }
 
-    async updateOrder(orderId, userId, order, transaction = null) {
+    async updateOrder(orderId, order, transaction = null) {
         try {
             const [affectedRows] = await this.Order.update(order, {
-                 where: { id: orderId, userId},
+                 where: { id: orderId},
                  transaction
             })
             return affectedRows;
