@@ -1,6 +1,9 @@
 class OrderPostgres {
     constructor(db) {
         this.Order = db.Order
+        this.User = db.User
+        this.MedicineOrder = db.MedicineOrder
+        this.Medicine = db.Medicine
     }
     async createOrder(order, transaction = null) {
         try {
@@ -16,6 +19,23 @@ class OrderPostgres {
         try {
             const orders = await this.Order.findAll({
                 where: { userId, status: 0, deletedAt: null },
+                attributes: { exclude: ['deletedAt', 'updatedAt'] },
+                include: [
+                    {
+                        model: this.User,
+                        attributes: ['id', 'phoneNumber']
+                    },
+                    {
+                        model: this.MedicineOrder,
+                        attributes: ['id', 'count', 'subTotal'],
+                        include: [
+                            {
+                                model: this.Medicine,
+                                attributes: ['id', 'name', 'price', 'image']
+                            },
+                        ]
+                    }
+                ],
                 transaction
             })
             return orders

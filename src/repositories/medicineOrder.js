@@ -90,7 +90,7 @@ class MedicineOrderPostgres {
     async deleteMedicineOrder(medicineOrderId, transaction = null) {
         try {
             const affectedRows = await this.MedicineOrder.destroy({
-                where: { id: medicineOrderId },
+                where: { id: medicineOrderId, orderId: null },
                 transaction
             })
             return affectedRows;

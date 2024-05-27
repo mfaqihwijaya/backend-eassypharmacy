@@ -11,12 +11,6 @@ class OrderService {
     }
     async getOrders(userId) {
         try {
-            const user = await this.userRepo.getUserById(userId);
-            if (!user) {
-                const error = new Error(ErrorMessage.ERROR_USER_NOT_FOUND);
-                error.status = 404;
-                throw error;
-            }
             const orders = await this.orderRepo.getOrders(userId);
             return orders;
         } catch (error) {
@@ -156,7 +150,6 @@ class OrderService {
                     userId,
                     total,
                     address: user.address,
-                    paidAt: new Date()
                 }
                 const order = await this.orderRepo.createOrder(newOrderData, t)
 
