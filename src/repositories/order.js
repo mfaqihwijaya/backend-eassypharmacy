@@ -48,6 +48,7 @@ class OrderPostgres {
         try {
             const order = await this.Order.findOne({ 
                 where: { id: orderId, deletedAt: null },
+                attributes: { exclude: ['deletedAt', 'updatedAt'] },
                 transaction
             })
             return order

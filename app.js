@@ -28,6 +28,7 @@ const { MedicineCategoryService } = require("./src/service/medicineCategory");
 const { MedicineCategoryController } = require("./src/controller/medicineCategory");
 const { MedicineCategoryRouter } = require("./src/router/medicineCategory");
 const { MedicineCategoryPostgres } = require("./src/repositories/medicineCategory");
+const { OrderMiddleware } = require("./src/middlewares/order");
 
 
 async function serveBackend() {
@@ -80,6 +81,7 @@ async function prepare() {
   const jwtMiddleware = new JWTMiddleware(authService);
   const authMiddleware = new AuthMiddleware();
   const medicineOrderMiddleware = new MedicineOrderMiddleware();
+  const orderMiddleware = new OrderMiddleware();
   
   // router
   const authRouter = new AuthRouter(app, authMiddleware, authController);
@@ -90,7 +92,7 @@ async function prepare() {
     medicineOrderMiddleware,
     medicineOrderController
   );
-  const orderRouter = new OrderRouter(app, jwtMiddleware, orderController);
+  const orderRouter = new OrderRouter(app, jwtMiddleware, orderMiddleware, orderController);
   const medicineCategoryRouter = new MedicineCategoryRouter(app, medicineCategoryController);
   
   // mount all 

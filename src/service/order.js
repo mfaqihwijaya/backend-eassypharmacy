@@ -22,12 +22,12 @@ class OrderService {
             const order = await this.orderRepo.getOrderById(orderId);
             if (!order) {
                 const error = new Error(ErrorMessage.ERROR_ORDER_NOT_FOUND)
-                error.status = 404
+                error.status = RESPONSE_STATUS_CODE.NOT_FOUND
                 throw error
             }
             if (order.userId != userId) {
                 const error = new Error(ErrorMessage.ERROR_RESTRICTED_ACCESS)
-                error.status = 403
+                error.status = RESPONSE_STATUS_CODE.FORBIDDEN
                 throw error
             }
             return order
@@ -38,28 +38,21 @@ class OrderService {
     async updateOrderAddress(userId, orderId, address) {
         try {
             const affectedRows = await sequelize.transaction(async (t) => {
-                // check user is exist
-                const user = await this.userRepo.getUserById(userId);
-                if (!user) {
-                    const error = new Error(ErrorMessage.ERROR_USER_NOT_FOUND);
-                    error.status = 404;
-                    throw error;
-                }
                 // check order is exist waiting & match user
                 const order = await this.orderRepo.getOrderById(orderId);
                 if (!order) {
                     const error = new Error(ErrorMessage.ERROR_ORDER_NOT_FOUND);
-                    error.status = 404;
+                    error.status = RESPONSE_STATUS_CODE.NOT_FOUND;
                     throw error;
                 }
                 if(order.status != ORDER_STATUS.WAITING) {
                     const error = new Error(ErrorMessage.ERROR_ORDER_NOT_WAITING);
-                    error.status = 500;
+                    error.status = RESPONSE_STATUS_CODE.BAD_REQUEST;
                     throw error;
                 }
                 if (order.userId != userId) {
                     const error = new Error(ErrorMessage.ERROR_RESTRICTED_ACCESS);
-                    error.status = 403;
+                    error.status = RESPONSE_STATUS_CODE.FORBIDDEN;
                     throw error;
                 }
                 const updateData = {
@@ -75,28 +68,21 @@ class OrderService {
     async cancelOrder(orderId, userId) {
         try {
             const cancelledOrder = await sequelize.transaction(async (t) => {
-                // check user is exist
-                const user = await this.userRepo.getUserById(userId, t);
-                if (!user) {
-                    const error = new Error(ErrorMessage.ERROR_USER_NOT_FOUND);
-                    error.status = 404;
-                    throw error;
-                }
                 // check order is exist waiting & match user
                 const order = await this.orderRepo.getOrderById(orderId, t);
                 if (!order) {
                     const error = new Error(ErrorMessage.ERROR_ORDER_NOT_FOUND);
-                    error.status = 404;
+                    error.status = RESPONSE_STATUS_CODE.NOT_FOUND;
                     throw error;
                 }
                 if(order.status != ORDER_STATUS.WAITING) {
                     const error = new Error(ErrorMessage.ERROR_ORDER_NOT_WAITING);
-                    error.status = 500;
+                    error.status = RESPONSE_STATUS_CODE.BAD_REQUEST;
                     throw error;
                 }
                 if (order.userId != userId) {
                     const error = new Error(ErrorMessage.ERROR_RESTRICTED_ACCESS);
-                    error.status = 403;
+                    error.status = RESPONSE_STATUS_CODE.FORBIDDEN;
                     throw error;
                 }
                 // restore medicine stock based on corresponding order
@@ -106,23 +92,21 @@ class OrderService {
                     const medicine = await this.medicineRepo.getMedicineById(medicineId, t);
                     if (!medicine) {
                         const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_FOUND);
-                        error.status = 404;
+                        error.status = RESPONSE_STATUS_CODE.NOT_FOUND;
                         throw error;
                     }
                     const restoreMedicineStock = {
-                        id: medicine.id,
+                        id: medicineId,
                         stock: medicine.stock + count
                     }
                     await this.medicineRepo.updateMedicine(restoreMedicineStock, t);
                 }
                 // cancel order
                 const cancelOrderData = {
-                    id: orderId,
-                    userId,
                     status: ORDER_STATUS.CANCELLED
                 };
                 await this.orderRepo.updateOrder(orderId, cancelOrderData, t);
-                return cancelOrderData;
+                return { id: orderId, ...cancelOrderData };
             })
             return cancelledOrder;
         } catch (error) {

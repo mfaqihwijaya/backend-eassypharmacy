@@ -46,6 +46,9 @@ class OrderRouter {
             async (req, res, next) => {
                 this.jwtMiddleware.authenticate(req, res, next);
             },
+            async (req, res, next) => {
+                this.orderMiddleware.validateUpdateAddressParams(req, res, next);    
+            },
             async (req, res) => {
                 this.orderController.updateOrderAddress(req, res)
             }
