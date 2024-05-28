@@ -22,10 +22,10 @@ class OrderController {
             const { orderId } = req.params
             const order = await this.orderService.getOrderById(userId, orderId)
             const response = new SuccessResponse(SuccessMessage.ORDER_FETCHED, order)
-            res.status(200).send(response)
+            res.status(RESPONSE_STATUS_CODE.OK).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_ORDER_FETCH, err.message)]
-            res.status(err.status? err.status: 500).send(errs)
+            res.status(err.status? err.status: RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR).send(errs)
         }
     }
     async updateOrderAddress(req, res) {
@@ -35,10 +35,10 @@ class OrderController {
             const { address } = req.body
             const affectedRows = await this.orderService.updateOrderAddress(userId, orderId, address)
             const response = new SuccessResponse(SuccessMessage.ORDER_UPDATED, { affectedRows })
-            res.status(200).send(response)
+            res.status(RESPONSE_STATUS_CODE.OK).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_ORDER_UPDATE, err.message)]
-            res.status(err.status? err.status: 500).send(errs)
+            res.status(err.status? err.status: RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR).send(errs)
         }
     }
     async checkout(req, res) {
@@ -59,10 +59,10 @@ class OrderController {
             const { userId } = req
             const cancelledOrder = await this.orderService.cancelOrder(orderId, userId)
             const response = new SuccessResponse(SuccessMessage.ORDER_CANCELLED, cancelledOrder)
-            res.status(200).send(response)
+            res.status(RESPONSE_STATUS_CODE.OK).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_ORDER_CANCEL, err.message)]
-            res.status(err.status? err.status: 500).send(errs)
+            res.status(err.status? err.status: RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR).send(errs)
         }
     }
 }
