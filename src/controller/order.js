@@ -45,11 +45,12 @@ class OrderController {
         try {
             const { medicineOrderIds } = req.body
             const { userId } = req
-            const response = await this.orderService.checkout(userId, medicineOrderIds)
-            res.status(200).send(response)
+            const newOrder = await this.orderService.checkout(userId, medicineOrderIds)
+            const response = new SuccessResponse(SuccessMessage.ORDER_CHECKED_OUT, newOrder)
+            res.status(RESPONSE_STATUS_CODE.OK).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_ORDER_CHECKOUT, err.message)]
-            res.status(err.status? err.status: 500).send(errs)
+            res.status(err.status? err.status: RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR).send(errs)
         }
     }
     async cancelOrder(req, res) {

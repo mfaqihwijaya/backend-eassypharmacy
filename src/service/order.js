@@ -1,6 +1,6 @@
 const { sequelize } = require("../models/db");
 const { ErrorMessage } = require("../models/response");
-const { ORDER_STATUS } = require("../util/constants");
+const { ORDER_STATUS, RESPONSE_STATUS_CODE } = require("../util/constants");
 
 class OrderService {
     constructor(orderRepo, userRepo, medicineOrderRepo, medicineRepo) {
@@ -131,18 +131,11 @@ class OrderService {
     }
     async checkout(userId, medicineOrderIds) {
         try {
-            // check user & medicine is exist
-            const user = await this.userRepo.getUserById(userId);
-            if (!user) {
-                const error = new Error(ErrorMessage.ERROR_USER_NOT_FOUND);
-                error.status = 404;
-                throw error;
-            }
             const result = await sequelize.transaction(async (t) => {
                 const medicineOrders = await this.medicineOrderRepo.getMedicineOrderByIds(medicineOrderIds, t);
                 if(medicineOrders.length != medicineOrderIds.length) {
                     const error = new Error(ErrorMessage.ERROR_MEDICINE_ORDER_NOT_FOUND);
-                    error.status = 404;
+                    error.status = RESPONSE_STATUS_CODE.NOT_FOUND;
                     throw error
                 }
                 const total = await medicineOrders.reduce((total, medicineOrder) => total + medicineOrder.subTotal, 0)
@@ -158,7 +151,7 @@ class OrderService {
 
                     if (medicineOrder.userId !== userId) {
                         const error = new Error(ErrorMessage.ERROR_RESTRICTED_ACCESS);
-                        error.status = 403;
+                        error.status = RESPONSE_STATUS_CODE;
                         throw error;
                     }
 
@@ -166,14 +159,14 @@ class OrderService {
                     const medicine = await this.medicineRepo.getMedicineById(medicineId, t);
                     if (!medicine) {
                         const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_FOUND);
-                        error.status = 404;
+                        error.status = RESPONSE_STATUS_CODE.NOT_FOUND;
                         throw error;
                     }
 
                     // Check medicine stock
                     if (count > medicine.stock) {
                         const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_ENOUGH);
-                        error.status = 500;
+                        error.status = RESPONSE_STATUS_CODE.BAD_REQUEST;
                         throw error;
                     }
 
