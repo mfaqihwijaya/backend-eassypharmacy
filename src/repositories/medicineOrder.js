@@ -3,6 +3,7 @@ const { Sequelize } = require("../models/db");
 class MedicineOrderPostgres {
     constructor(db) {
         this.MedicineOrder = db.MedicineOrder;
+        this.Medicine = db.Medicine;
     }
 
     async createMedicineOrder(medicineOrder, transaction = null) {
@@ -16,7 +17,14 @@ class MedicineOrderPostgres {
     async getMedicineOrders(userId) {
         try {
             const medicineOrders = await this.MedicineOrder.findAll({
-                where: {userId: userId, orderId:null, deletedAt: null }
+                where: {userId: userId, orderId:null, deletedAt: null },
+                attributes: { exclude: ['updatedAt','deletedAt']},
+                include: [
+                    { 
+                        model: this.Medicine, 
+                        attributes: ['id', 'name', 'description', 'price', 'image'] 
+                    }
+                ]
             })
             return medicineOrders
         } catch (err) {
@@ -57,6 +65,17 @@ class MedicineOrderPostgres {
             throw err;
         }
     }
+    async getMedicineOrderByMedicineId(userId, medicineId, transaction = null) {
+        try {
+            const medicineOrder = await this.MedicineOrder.findOne({ 
+                where: { userId, medicineId, orderId:null, deletedAt: null }, 
+                transaction 
+            })
+            return medicineOrder
+        } catch (err) {
+            throw err;
+        }
+    }
     async updateMedicineOrder(medicineOrder, transaction = null) {
         try {
             const [affectedRows] = await this.MedicineOrder.update(medicineOrder, {
@@ -71,7 +90,7 @@ class MedicineOrderPostgres {
     async deleteMedicineOrder(medicineOrderId, transaction = null) {
         try {
             const affectedRows = await this.MedicineOrder.destroy({
-                where: { id: medicineOrderId },
+                where: { id: medicineOrderId, orderId: null },
                 transaction
             })
             return affectedRows;

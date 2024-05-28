@@ -1,6 +1,7 @@
 class OrderRouter {
-    constructor(app, jwtMiddleware, orderController) {
+    constructor(app, jwtMiddleware, orderMiddleware, orderController) {
         this.jwtMiddleware = jwtMiddleware
+        this.orderMiddleware = orderMiddleware
         this.orderController = orderController
         this.app = app
     }
@@ -22,6 +23,9 @@ class OrderRouter {
         orders.post(
             async (req, res, next) => {
                 this.jwtMiddleware.authenticate(req, res, next);
+            },
+            async (req, res, next) => {
+                this.orderMiddleware.validateCheckoutParams(req, res, next);
             },
             async (req, res) => {
                 this.orderController.checkout(req, res)

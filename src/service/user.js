@@ -1,3 +1,5 @@
+const { RESPONSE_STATUS_CODE } = require("../util/constants")
+
 class UserService {
     constructor(userRepo) {
         this.userRepo = userRepo
@@ -16,7 +18,7 @@ class UserService {
             const user = await this.userRepo.getUserById(userId)
             if (!user) {
                 const error = new Error(ErrorMessage.ERROR_USER_NOT_FOUND)
-                error.status = 404
+                error.status = RESPONSE_STATUS_CODE.NOT_FOUND
                 throw error
             }
             const profile = {

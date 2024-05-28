@@ -15,6 +15,7 @@ const SuccessMessage = {
     "ORDER_FETCHED": "order data successfully fetched",
     "ORDER_UPDATED": "order data succesfully updated",
     "ORDER_CANCELLED": "order data succesfully cancelled",
+    "ORDER_CHECKED_OUT": "successfully checking out your order",
 
     "CATEGORY_FETCHED": "category data successfully fetched",
 }

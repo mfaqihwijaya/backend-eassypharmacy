@@ -1,5 +1,6 @@
 const { sequelize } = require("../models/db");
 const { ErrorMessage } = require("../models/response");
+const { RESPONSE_STATUS_CODE } = require("../util/constants");
 
 class MedicineOrderService {
     constructor(medicineOrderRepo, medicineRepo, userRepo) {
@@ -16,25 +17,25 @@ class MedicineOrderService {
                 const user = await this.userRepo.getUserById(userId, t);
                 if (!user) {
                     const error = new Error(ErrorMessage.ERROR_USER_NOT_FOUND);
-                    error.status = 404;
+                    error.status = RESPONSE_STATUS_CODE.NOT_FOUND;
                     throw error;
                 }
                 const medicine = await this.medicineRepo.getMedicineById(medicineId, t);
                 if (!medicine) {
                     const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_FOUND);
-                    error.status = 404;
+                    error.status = RESPONSE_STATUS_CODE.NOT_FOUND;
                     throw error;
                 }
                 const isMedicineAlreadyInCart = await this.checkMedicineAlreadyInCart(userId, medicineId);
                 if (isMedicineAlreadyInCart) {
                     const error = new Error(ErrorMessage.ERROR_MEDICINE_ORDER_ALREADY_EXIST);
-                    error.status = 400;
+                    error.status = RESPONSE_STATUS_CODE.CONFLICT;
                     throw error;
                 }
                 // check medicine stock
                 if(count > medicine.stock) {   
                     const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_ENOUGH);
-                    error.status = 400;
+                    error.status = RESPONSE_STATUS_CODE.BAD_REQUEST;
                     throw error;
                 }
                 const subTotal = count * medicine.price;
@@ -56,7 +57,7 @@ class MedicineOrderService {
             const user = await this.userRepo.getUserById(userId);
             if (!user) {
                 const error = new Error(ErrorMessage.ERROR_USER_NOT_FOUND);
-                error.status = 404;
+                error.status = RESPONSE_STATUS_CODE.NOT_FOUND;
                 throw error;
             }
             const medicineOrders = await this.medicineOrderRepo.getMedicineOrders(userId);
@@ -71,12 +72,12 @@ class MedicineOrderService {
             const medicineOrder = await this.medicineOrderRepo.getMedicineOrderById(medicineOrderId);
             if (!medicineOrder) {
                 const error = new Error(ErrorMessage.ERROR_MEDICINE_ORDER_NOT_FOUND)
-                error.status = 404
+                error.status = RESPONSE_STATUS_CODE.NOT_FOUND
                 throw error
             }
             if (medicineOrder.userId != userId) {
                 const error = new Error(ErrorMessage.ERROR_RESTRICTED_ACCESS)
-                error.status = 403
+                error.status = RESPONSE_STATUS_CODE.FORBIDDEN
                 throw error
             }
             return medicineOrder
@@ -87,12 +88,11 @@ class MedicineOrderService {
 
     async checkMedicineAlreadyInCart(userId, medicineId) {
         try {
-            const medicineOrders = await this.medicineOrderRepo.getMedicineOrders(userId);
-            const filteredMedicineOrders = medicineOrders.filter(medicineOrder => medicineOrder.medicineId == medicineId);
-            if (filteredMedicineOrders.length > 0) {
-                return true
+            const medicineOrder = await this.medicineOrderRepo.getMedicineOrderByMedicineId(userId, medicineId);
+            if(!medicineOrder) {
+                return false
             }
-            return false
+            return true
         } catch (error) {
             throw error
         }
@@ -103,23 +103,23 @@ class MedicineOrderService {
                 const medicineOrder = await this.medicineOrderRepo.getMedicineOrderById(medicineOrderId);
                 if (!medicineOrder) {
                     const error = new Error(ErrorMessage.ERROR_MEDICINE_ORDER_NOT_FOUND)
-                    error.status = 404
+                    error.status = RESPONSE_STATUS_CODE.NOT_FOUND
                     throw error
                 }
                 if (medicineOrder.userId != userId) {
                     const error = new Error(ErrorMessage.ERROR_RESTRICTED_ACCESS)
-                    error.status = 403
+                    error.status = RESPONSE_STATUS_CODE.FORBIDDEN
                     throw error
                 }
                 const medicine = await this.medicineRepo.getMedicineById(medicineOrder.medicineId, t);
                 if (!medicine) {
                     const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_FOUND)
-                    error.status = 404
+                    error.status = RESPONSE_STATUS_CODE.NOT_FOUND
                     throw error
                 }
                 if(quantity > medicine.stock) {
                     const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_ENOUGH)
-                    error.status = 500
+                    error.status = RESPONSE_STATUS_CODE.BAD_REQUEST
                     throw error
                 }
                 const subTotal = quantity * medicine.price
@@ -141,14 +141,15 @@ class MedicineOrderService {
         try {
             const affectedRows = await sequelize.transaction(async (t) => {
                 const medicineOrder = await this.medicineOrderRepo.getMedicineOrderById(medicineOrderId, t);
-                if (!medicineOrder) {
+                // check is exist & never been checkouted
+                if (!medicineOrder || medicineOrder.orderId != null) {
                     const error = new Error(ErrorMessage.ERROR_MEDICINE_ORDER_NOT_FOUND)
-                    error.status = 404
+                    error.status = RESPONSE_STATUS_CODE.NOT_FOUND
                     throw error
                 }
                 if (medicineOrder.userId != userId) {
                     const error = new Error(ErrorMessage.ERROR_RESTRICTED_ACCESS)
-                    error.status = 403
+                    error.status = RESPONSE_STATUS_CODE.FORBIDDEN
                     throw error
                 }
                 return await this.medicineOrderRepo.deleteMedicineOrder(medicineOrderId, t);

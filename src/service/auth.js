@@ -1,7 +1,9 @@
 const { ErrorMessage } = require('../models/response')
+const { sequelize } = require("../models/db");
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const Token = require('../models/token')
+const { RESPONSE_STATUS_CODE } = require('../util/constants')
 class AuthService {
     constructor(userRepo, sessionConfig) {
         this.userRepo = userRepo
@@ -9,26 +11,27 @@ class AuthService {
     }
     async userRegister(user) {
         try {
-            console.log('faqih', user);
-            const emailExist = await this.userRepo.getUserByEmail(user.email)
-            const usernameExist = await this.userRepo.getUserByUsername(user.username)
-            if (emailExist) {
-                const error = new Error(ErrorMessage.ERROR_USER_EMAIL_USED)
-                error.status = 409
-                throw error
-            }
-            if (usernameExist) {
-                const error = new Error(ErrorMessage.ERROR_USER_USERNAME_USED)
-                error.status = 409
-                throw error
-            }
-            const hashedPassword = await this.hashPassword(user.password)
-            user.password = hashedPassword
-            await this.userRepo.createUser(user)
-            const newUser = {
-                username: user.username,
-                email: user.email
-            }
+            const newUser = await sequelize.transaction(async (t) => {
+                const emailExist = await this.userRepo.getUserByEmail(user.email, t)
+                const usernameExist = await this.userRepo.getUserByUsername(user.username, t)
+                if (emailExist) {
+                    const error = new Error(ErrorMessage.ERROR_USER_EMAIL_USED)
+                    error.status = RESPONSE_STATUS_CODE.CONFLICT
+                    throw error
+                }
+                if (usernameExist) {
+                    const error = new Error(ErrorMessage.ERROR_USER_USERNAME_USED)
+                    error.status = RESPONSE_STATUS_CODE.CONFLICT
+                    throw error
+                }
+                const hashedPassword = await this.hashPassword(user.password)
+                user.password = hashedPassword
+                await this.userRepo.createUser(user, t)
+                return {
+                    username: user.username,
+                    email: user.email
+                }
+            })
             return newUser
         } catch (err) {
             throw err;
@@ -40,7 +43,7 @@ class AuthService {
             const userData = await this.userRepo.getUserByEmail(user.email)
             if (!userData) {
                 const error = new Error(ErrorMessage.ERROR_USER_NOT_FOUND)
-                error.status = 404
+                error.status = RESPONSE_STATUS_CODE.NOT_FOUND
                 throw error
             }
             // compare password
@@ -49,7 +52,7 @@ class AuthService {
             const isMatch = await this.comparePassword(plainPassword, hashedPassword)
             if (!isMatch) {
                 const error = new Error(ErrorMessage.ERROR_INVALID_PASSWORD)
-                error.status = 403
+                error.status = RESPONSE_STATUS_CODE.UNAUTHORIZED
                 throw error
             }
             // generate token
@@ -100,7 +103,7 @@ class AuthService {
             const user = await this.userRepo.getUserById(sub)
             if(!user) {
                 const error = new Error(ErrorMessage.ERROR_INVALID_ACCESS_TOKEN);
-                error.status = 403;
+                error.status = RESPONSE_STATUS_CODE.UNAUTHORIZED;
                 throw error;
             }
             return decoded

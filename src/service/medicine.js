@@ -1,5 +1,6 @@
 const { Sequelize } = require("../models/db")
 const { ErrorMessage } = require("../models/response")
+const { RESPONSE_STATUS_CODE } = require("../util/constants")
 
 class MedicineService {
     constructor(medicineRepo) {
@@ -20,12 +21,16 @@ class MedicineService {
             const limit = count
             const offset = count * (page - 1)
             const order = [[column, orderType]]
-            const countData = await this.medicineRepo.countMedicines()
-            const medicines = await this.medicineRepo.getMedicines(whereSearch, limit, offset, order);
+            const medicines = await this.medicineRepo.getMedicines(whereSearch, limit, offset, order);  
+            // remove unnecessary field
+            const countData = await this.medicineRepo.countMedicines(whereSearch)
             const paginatedData = {
                 medicines,
                 pagination: {
-                    totalData: countData
+                    totalData: countData,
+                    currentPage: page,
+                    pageSize: count,
+                    totalPage: Math.ceil(countData / count),
                 }
             }
             return paginatedData;
@@ -39,7 +44,7 @@ class MedicineService {
             const medicine = await this.medicineRepo.getMedicineById(medicineId);
             if (!medicine) {
                 const error = new Error(ErrorMessage.ERROR_MEDICINE_NOT_FOUND)
-                error.status = 404
+                error.status = RESPONSE_STATUS_CODE.NOT_FOUND
                 throw error
             }
             return medicine
