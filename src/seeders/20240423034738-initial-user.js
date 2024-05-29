@@ -1,5 +1,14 @@
 'use strict';
-
+const bcrypt = require('bcrypt')
+async function hashPassword(password) {
+  try {
+      const salt = await bcrypt.genSalt(10)
+      const hashed = await bcrypt.hash(password, salt)
+      return hashed
+  } catch (err) {
+      throw err;
+  }
+}
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
@@ -16,7 +25,7 @@ module.exports = {
       {
         username: 'username1',
         email: 'username1@example.com',
-        password: 'username1pass123',
+        password: await hashPassword('username1pass123'),
         phoneNumber: '09123456789',
         address: "Yogyakarta",
         createdAt: new Date(),
@@ -25,7 +34,7 @@ module.exports = {
       {
         username: 'username2',
         email: 'username2@example.com',
-        password: 'username2pass123',
+        password: await hashPassword('username2pass123'),
         phoneNumber: '08122456689',
         address: "Palangkaraya",
         createdAt: new Date(),
@@ -34,7 +43,7 @@ module.exports = {
       {
         username: 'username3',
         email: 'username3@example.com',
-        password: 'username3pass123',
+        password: await hashPassword('username3pass123'),
         phoneNumber: '08123456789',
         address: "Riau",
         createdAt: new Date(),

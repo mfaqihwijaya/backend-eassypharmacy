@@ -31,21 +31,22 @@ const { MedicineCategoryPostgres } = require("./src/repositories/medicineCategor
 const { OrderMiddleware } = require("./src/middlewares/order");
 
 
-async function serveBackend() {
-  const app = await prepare()
+function serveBackend() {
+  const app = prepare()
 
   // running server
   const server = app.listen(config.server.port, () => {
     console.log(`server is running on port ${config.server.port}`);
   });
 
-
   // events to shut down
   process.on("SIGTERM", expressGraceful(server, db.sequelize));
   process.on("SIGINT", expressGraceful(server, db.sequelize));
+  
+  return server;
 }
 
-async function prepare() {
+function prepare() {
   // make express app
   const app = express();
   // middleware
@@ -115,5 +116,4 @@ function expressGraceful(server, dbConnection) {
     await dbConnection.close()
   };
 }
-
-serveBackend();
+module.exports = serveBackend();
