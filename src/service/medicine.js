@@ -9,7 +9,15 @@ class MedicineService {
 
     async getMedicines(query) {
         try {
-            const { keyword = '', count = 8, page = 1, column = 'name', orderType = 'ASC', categoryId = null } = query
+            const { 
+                keyword = '',
+                count = 8,
+                page = 1,
+                column = 'name',
+                orderType = 'ASC',
+                categoryId = null,
+                isStock = 0,
+            } = query
             const whereSearch = {
                 name: {
                     [Sequelize.Op.iLike]: `%${keyword}%`
@@ -17,6 +25,11 @@ class MedicineService {
             }
             if (categoryId) {
                 whereSearch.categoryId = categoryId
+            }
+            if (isStock == 1) {
+                whereSearch.stock = {
+                    [Sequelize.Op.gt]: 0
+                }
             }
             const limit = count
             const offset = count * (page - 1)
