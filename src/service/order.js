@@ -116,6 +116,12 @@ class OrderService {
     async checkout(userId, medicineOrderIds) {
         try {
             const result = await sequelize.transaction(async (t) => {
+                const user = await this.userRepo.getUserById(userId, t);
+                if (!user) {
+                    const error = new Error(ErrorMessage.ERROR_USER_NOT_FOUND);
+                    error.status = RESPONSE_STATUS_CODE.NOT_FOUND;
+                    throw error
+                }
                 const medicineOrders = await this.medicineOrderRepo.getMedicineOrderByIds(medicineOrderIds, t);
                 if(medicineOrders.length != medicineOrderIds.length) {
                     const error = new Error(ErrorMessage.ERROR_MEDICINE_ORDER_NOT_FOUND);
