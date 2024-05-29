@@ -38,6 +38,12 @@ class MedicinePostgres {
         try {
             const medicine = await this.Medicine.findOne({ 
                 where: { id: medicineId, deletedAt: null },
+                include: [
+                    {
+                        model: this.MedicineCategory,
+                        attributes: ['id', 'name']
+                    }
+                ],
                 transaction
             })
             return medicine
