@@ -1,14 +1,6 @@
 'use strict';
 const bcrypt = require('bcrypt')
-async function hashPassword(password) {
-  try {
-      const salt = await bcrypt.genSalt(10)
-      const hashed = await bcrypt.hash(password, salt)
-      return hashed
-  } catch (err) {
-      throw err;
-  }
-}
+const { hashPassword } = require('../util/crypto')
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {

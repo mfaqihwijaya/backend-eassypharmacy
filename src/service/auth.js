@@ -1,6 +1,6 @@
 const { ErrorMessage } = require('../models/response')
 const { sequelize } = require("../models/db");
-const bcrypt = require('bcrypt')
+const { hashPassword, comparePassword } = require('../util/crypto')
 const jwt = require('jsonwebtoken')
 const Token = require('../models/token')
 const { RESPONSE_STATUS_CODE } = require('../util/constants')
@@ -24,7 +24,7 @@ class AuthService {
                     error.status = RESPONSE_STATUS_CODE.CONFLICT
                     throw error
                 }
-                const hashedPassword = await this.hashPassword(user.password)
+                const hashedPassword = await hashPassword(user.password)
                 user.password = hashedPassword
                 await this.userRepo.createUser(user, t)
                 return {
@@ -49,7 +49,7 @@ class AuthService {
             // compare password
             const hashedPassword = userData.password
             const plainPassword = user.password
-            const isMatch = await this.comparePassword(plainPassword, hashedPassword)
+            const isMatch = await comparePassword(plainPassword, hashedPassword)
             if (!isMatch) {
                 const error = new Error(ErrorMessage.ERROR_INVALID_PASSWORD)
                 error.status = RESPONSE_STATUS_CODE.UNAUTHORIZED
@@ -58,22 +58,6 @@ class AuthService {
             // generate token
             const tokens = await this.createUserToken(userData)
             return tokens
-        } catch (err) {
-            throw err;
-        }
-    }
-    async hashPassword(password) {
-        try {
-            const salt = await bcrypt.genSalt(10)
-            const hashed = await bcrypt.hash(password, salt)
-            return hashed
-        } catch (err) {
-            throw err;
-        }
-    }
-    async comparePassword(password, hashed) {
-        try {
-            return await bcrypt.compare(password, hashed)
         } catch (err) {
             throw err;
         }
