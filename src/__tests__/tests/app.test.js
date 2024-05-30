@@ -6,6 +6,8 @@ const { RESPONSE_STATUS_CODE } = require('../../util/constants');
 const { ErrorType, ErrorMessage } = require('../../models/response');
 const { hashPassword } = require('../../util/crypto');
 
+const userToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsImlhdCI6MTcxNjY3NzQwMDc4NH0.P3BXm9C_ZXQzo9rqH8w87rulRXizi6s_CdAld4tJVpE'
+
 beforeAll(async () => {
     try {
         await db.sequelize.authenticate()
@@ -129,6 +131,28 @@ describe('REGISTER', () => {
             expect(response.body[0].message).toBe(ErrorMessage.ERROR_USER_USERNAME_USED);
         })
     })
+    describe('when database request fail',  () => {
+        beforeEach(async () => {
+            getUserStub.throws(new Error('error database'));
+        })
+        const payload = {
+            username: 'username2',
+            email: 'username2@example.com',
+            password: 'username2pass123',
+            phoneNumber: '0123456789',
+            address: 'address2',
+        }
+        test('should return status code internal server error 500', async () => {
+            const response = await request(app).post(path).send(payload);
+            expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR);
+        })
+        test('should respond with error response', async () => {
+            const response = await request(app).post(path).send(payload);
+            expect(response.body[0]).toHaveProperty('error');
+            expect(response.body[0]).toHaveProperty('message');
+            expect(response.body[0].error).toBe(ErrorType.ERROR_USER_REGISTER);
+        })
+    })
 })
 
 describe('LOGIN', () => {
@@ -238,30 +262,207 @@ describe('LOGIN', () => {
             expect(response.body[0].message).toBe(ErrorMessage.ERROR_INVALID_PASSWORD);
         })
     })
+    describe('when database request fail',  () => {
+        beforeEach(async () => {
+            getUserStub.throws(new Error('error database'));
+        })
+        const payload = {
+            email: 'testemail@gmail.com',
+            password: 'testpassword123'
+        }
+        test('should return status code internal server error 500', async () => {
+            const response = await request(app).post(path).send(payload);
+            expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR);
+        })
+        test('should respond with error response', async () => {
+            const response = await request(app).post(path).send(payload);
+            expect(response.body[0]).toHaveProperty('error');
+            expect(response.body[0]).toHaveProperty('message');
+            expect(response.body[0].error).toBe(ErrorType.ERROR_USER_LOGIN);
+        })
+    })
 })
 
 describe('MEDICINE', () => {
-    const path = '/api/v1/medicines'
-    describe('when get all medicines success',  () => {
-        test('should return status code 200', async () => {
-            const response = await request(app).get(path);
-            expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.OK);
+    describe('LIST MEDICINES', () => {
+        const path = '/api/v1/medicines'
+        describe('when get all medicines success',  () => {
+            test('should return status code 200', async () => {
+                const response = await request(app).get(path);
+                expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.OK);
+            })
+            test('should return an array of medicines', async () => {
+                const response = await request(app).get(path);
+                expect(response.body.data).toHaveProperty('medicines');
+                expect(Array.isArray(response.body.data.medicines)).toBe(true);
+            })
         })
-        test('should return an array of medicines', async () => {
-            const response = await request(app).get(path);
-            expect(response.body.data).toHaveProperty('medicines');
-            expect(Array.isArray(response.body.data.medicines)).toBe(true);
+        describe('when get all medicines with filter', () => {
+            test('should return status code 200', async () => {
+                const response = await request(app).get(path);
+                expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.OK);
+            })
+            test('should return an array of medicines', async () => {
+                const response = await request(app).get(path).query({ categoryId: 3, isStock: 1 });
+                expect(response.body.data).toHaveProperty('medicines');
+                expect(Array.isArray(response.body.data.medicines)).toBe(true);
+            })
+        })
+        describe('when database request fail',  () => {
+            beforeEach(async () => {
+                sinon.stub(db.Medicine, 'findAll').throws(new Error('error database'));
+            })
+            afterEach(async () => {
+                sinon.restore();
+            })
+            test('should return status code internal server error 500', async () => {
+                const response = await request(app).get(path);
+                expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR);
+            })
+            test('should respond with error response', async () => {
+                const response = await request(app).get(path);
+                expect(response.body[0]).toHaveProperty('error');
+                expect(response.body[0]).toHaveProperty('message');
+                expect(response.body[0].error).toBe(ErrorType.ERROR_MEDICINE_FETCH);
+            })
         })
     })
-    describe('when get all medicines with query params', () => {
+    describe('MEDICINE ID', () => {
+        const path = '/api/v1/medicines/:medicineId';
+        describe('when get medicine by id success',  () => {
+            test('should return status code 200', async () => {
+                const response = await request(app).get(path.replace(':medicineId', 1));
+                expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.OK);
+            })
+            test('should return an object of medicine', async () => {
+                const response = await request(app).get(path.replace(':medicineId', 1));
+                expect(response.body.data).toHaveProperty('MedicineCategory');
+            })
+        })
+        describe('when get medicine by id not found',  () => {
+            test('should return status code not found 404', async () => {
+                const response = await request(app).get(path.replace(':medicineId', 999));
+                expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.NOT_FOUND);
+            })
+            test('should return an object of medicine', async () => {
+                const response = await request(app).get(path.replace(':medicineId', 999));
+                expect(response.body[0]).toHaveProperty('error');
+                expect(response.body[0]).toHaveProperty('message');
+                expect(response.body[0].error).toBe(ErrorType.ERROR_MEDICINE_FETCH);
+            })
+        })
+        describe('when database request fail',  () => {
+            beforeEach(async () => {
+                sinon.stub(db.Medicine, 'findOne').throws(new Error('error database'));
+            })
+            afterEach(async () => {
+                sinon.restore();
+            })
+            test('should return status code internal server error 500', async () => {
+                const response = await request(app).get(path.replace(':medicineId', 1));
+                expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR);
+            })
+            test('should respond with error response', async () => {
+                const response = await request(app).get(path.replace(':medicineId', 1));
+                expect(response.body[0]).toHaveProperty('error');
+                expect(response.body[0]).toHaveProperty('message');
+                expect(response.body[0].error).toBe(ErrorType.ERROR_MEDICINE_FETCH);
+            })
+        })
+    })
+})
+
+describe('MEDICINE CATEGORY', () => {
+    afterEach(async () => {
+        sinon.restore()
+    })
+    describe('LIST CATEGORIES', () => {
+        describe('when get all categories success',  () => {
+            const path = '/api/v1/categories'
+            test('should return status code 200', async () => {
+                const response = await request(app).get(path);
+                expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.OK);
+            })
+            test('should return an array of categories', async () => {
+                const response = await request(app).get(path);
+                expect(Array.isArray(response.body.data)).toBe(true);
+                expect(response.body.data[0]).toHaveProperty('id');
+                expect(response.body.data[0]).toHaveProperty('name');
+            })
+        })
+        describe('when database request fail',  () => {
+            beforeEach(async () => {
+                sinon.stub(db.MedicineCategory, 'findAll').throws(new Error('error database'));
+            })
+            test('should return status code internal server error 500', async () => {
+                const response = await request(app).get('/api/v1/categories');
+                expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR);
+            })
+            test('should respond with error response', async () => {
+                const response = await request(app).get('/api/v1/categories');
+                expect(response.body[0]).toHaveProperty('error');
+                expect(response.body[0]).toHaveProperty('message');
+                expect(response.body[0].error).toBe(ErrorType.ERROR_CATEGORY_FETCH);
+            })
+        })
+    })
+})
+
+describe('USER', () => {
+    afterEach(async () => {
+        sinon.restore()
+    })
+    const path = '/api/v1/profile'
+    describe('when get user profile success', () => {
+        beforeEach(async () => {
+            sinon.stub(db.User, 'findOne').resolves({
+                id: 4,
+                username: 'mfaqihw',
+                email: 'faqih.wijaya@bithealth.co.id',
+                phoneNumber: null,
+                address: 'Yogyakarta',
+            })
+        })
         test('should return status code 200', async () => {
-            const response = await request(app).get(path);
+            const response = await request(app).get(path).set('Authorization', `Bearer ${userToken}`);
             expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.OK);
         })
-        test('should return an array of medicines', async () => {
-            const response = await request(app).get(path).query({ categoryId: 3, isStock: 1 });
-            expect(response.body.data).toHaveProperty('medicines');
-            expect(Array.isArray(response.body.data.medicines)).toBe(true);
+        test('should return user profile object', async () => {
+            const response = await request(app).get(path).set('Authorization', `Bearer ${userToken}`);
+            expect(response.body.data).toHaveProperty('username');
+            expect(response.body.data).toHaveProperty('email');
+            expect(response.body.data).toHaveProperty('phoneNumber');
+            expect(response.body.data).toHaveProperty('address');
+        })
+    })
+    describe('when get user profile not found', () => {
+        beforeEach(async () => {
+            sinon.stub(db.User, 'findOne').resolves(null);
+        })
+        test('should return status code not found 404', async () => {
+            const response = await request(app).get(path).set('Authorization', `Bearer ${userToken}`);
+            expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.NOT_FOUND);
+        })
+        test('should return an object of user', async () => {
+            const response = await request(app).get(path).set('Authorization', `Bearer ${userToken}`);
+            expect(response.body[0]).toHaveProperty('error');
+            expect(response.body[0]).toHaveProperty('message');
+            expect(response.body[0].error).toBe(ErrorType.ERROR_USER_FETCH);
+        })
+    })
+    describe('when database request fail', () => {
+        beforeEach(async () => {
+            sinon.stub(db.User, 'findOne').throws(new Error('error database'));
+        })
+        test('should return status code internal server error 500', async () => {
+            const response = await request(app).get(path).set('Authorization', `Bearer ${userToken}`);
+            expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR);
+        })
+        test('should respond with error response', async () => {
+            const response = await request(app).get(path).set('Authorization', `Bearer ${userToken}`);
+            expect(response.body[0]).toHaveProperty('error');
+            expect(response.body[0]).toHaveProperty('message');
+            expect(response.body[0].error).toBe(ErrorType.ERROR_USER_FETCH);
         })
     })
 })

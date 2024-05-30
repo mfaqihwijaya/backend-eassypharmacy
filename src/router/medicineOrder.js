@@ -56,7 +56,7 @@ class MedicineOrderRouter {
             async (req, res, next) => {
                 this.jwtMiddleware.authenticate(req, res, next);
             },
-            async (req, res) => {
+            async (req, res, next) => {
                 this.medicineOrderMiddleware.validateUpdateMedicineOrderParams(req, res, next)
             },
             async (req, res) => {
