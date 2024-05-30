@@ -35,8 +35,9 @@ function serveBackend() {
   const app = prepare()
 
   // running server
-  const server = app.listen(config.server.port, () => {
-    console.log(`server is running on port ${config.server.port}`);
+  const env = process.env.NODE_ENV || 'development';
+  const server = app.listen(config.server[env].port, () => {
+    console.log(`server is running on port ${config.server[env].port}`);
   });
 
   // events to shut down
