@@ -38,7 +38,7 @@ class MedicineService {
             // remove unnecessary field
             const countData = await this.medicineRepo.countMedicines(whereSearch)
             const paginatedData = {
-                medicines,
+                medicines, 
                 pagination: {
                     totalData: countData,
                     currentPage: page,
