@@ -1,4 +1,4 @@
-const { Sequelize } = require("../models/db");
+const { Sequelize } = require('../models/db');
 
 class MedicineOrderPostgres {
     constructor(db) {
@@ -8,7 +8,7 @@ class MedicineOrderPostgres {
 
     async createMedicineOrder(medicineOrder, transaction = null) {
         try {
-            await this.MedicineOrder.create(medicineOrder, { transaction })
+            await this.MedicineOrder.create(medicineOrder, { transaction });
         } catch (err) {
             throw err;
         }
@@ -17,16 +17,22 @@ class MedicineOrderPostgres {
     async getMedicineOrders(userId) {
         try {
             const medicineOrders = await this.MedicineOrder.findAll({
-                where: {userId: userId, orderId:null, deletedAt: null },
-                attributes: { exclude: ['updatedAt','deletedAt']},
+                where: { userId: userId, orderId: null, deletedAt: null },
+                attributes: { exclude: ['updatedAt', 'deletedAt'] },
                 include: [
-                    { 
-                        model: this.Medicine, 
-                        attributes: ['id', 'name', 'description', 'price', 'image'] 
-                    }
-                ]
-            })
-            return medicineOrders
+                    {
+                        model: this.Medicine,
+                        attributes: [
+                            'id',
+                            'name',
+                            'description',
+                            'price',
+                            'image',
+                        ],
+                    },
+                ],
+            });
+            return medicineOrders;
         } catch (err) {
             throw err;
         }
@@ -34,54 +40,63 @@ class MedicineOrderPostgres {
 
     async getMedicineOrderById(medicineOrderId, transaction = null) {
         try {
-            const medicineOrder = await this.MedicineOrder.findOne({ 
-                where: { id: medicineOrderId, deletedAt: null }, 
-                transaction 
-            })
-            return medicineOrder
+            const medicineOrder = await this.MedicineOrder.findOne({
+                where: { id: medicineOrderId, deletedAt: null },
+                transaction,
+            });
+            return medicineOrder;
         } catch (err) {
             throw err;
         }
     }
     async getMedicineOrderByOrderId(orderId, transaction = null) {
         try {
-            const medicineOrders = await this.MedicineOrder.findAll({ 
-                where: { orderId: orderId, deletedAt: null }, 
-                transaction 
-            })
-            return medicineOrders
+            const medicineOrders = await this.MedicineOrder.findAll({
+                where: { orderId: orderId, deletedAt: null },
+                transaction,
+            });
+            return medicineOrders;
         } catch (err) {
             throw err;
         }
     }
     async getMedicineOrderByIds(medicineOrderIds, transaction = null) {
         try {
-            const medicineOrders = await this.MedicineOrder.findAll({ 
-                where: { id: {
-                    [Sequelize.Op.in]: medicineOrderIds 
-                }, orderId:null, deletedAt: null }, transaction })
-            return medicineOrders
+            const medicineOrders = await this.MedicineOrder.findAll({
+                where: {
+                    id: {
+                        [Sequelize.Op.in]: medicineOrderIds,
+                    },
+                    orderId: null,
+                    deletedAt: null,
+                },
+                transaction,
+            });
+            return medicineOrders;
         } catch (err) {
             throw err;
         }
     }
     async getMedicineOrderByMedicineId(userId, medicineId, transaction = null) {
         try {
-            const medicineOrder = await this.MedicineOrder.findOne({ 
-                where: { userId, medicineId, orderId:null, deletedAt: null }, 
-                transaction 
-            })
-            return medicineOrder
+            const medicineOrder = await this.MedicineOrder.findOne({
+                where: { userId, medicineId, orderId: null, deletedAt: null },
+                transaction,
+            });
+            return medicineOrder;
         } catch (err) {
             throw err;
         }
     }
     async updateMedicineOrder(medicineOrder, transaction = null) {
         try {
-            const [affectedRows] = await this.MedicineOrder.update(medicineOrder, {
-                where: { id: medicineOrder.id },
-                transaction
-            })
+            const [affectedRows] = await this.MedicineOrder.update(
+                medicineOrder,
+                {
+                    where: { id: medicineOrder.id },
+                    transaction,
+                }
+            );
             return affectedRows;
         } catch (err) {
             throw err;
@@ -91,8 +106,8 @@ class MedicineOrderPostgres {
         try {
             const affectedRows = await this.MedicineOrder.destroy({
                 where: { id: medicineOrderId, orderId: null },
-                transaction
-            })
+                transaction,
+            });
             return affectedRows;
         } catch (err) {
             throw err;
@@ -100,4 +115,4 @@ class MedicineOrderPostgres {
     }
 }
 
-module.exports = { MedicineOrderPostgres }
+module.exports = { MedicineOrderPostgres };

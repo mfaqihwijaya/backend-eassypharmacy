@@ -5,7 +5,7 @@ class UserPostgres {
 
     async createUser(user, transaction = null) {
         try {
-            await this.User.create(user, { transaction })
+            await this.User.create(user, { transaction });
         } catch (err) {
             throw err;
         }
@@ -13,28 +13,36 @@ class UserPostgres {
 
     async getUserById(userId, transaction = null) {
         try {
-            const user = await this.User.findOne({ 
-                where: { id: userId, deletedAt: null }, transaction })
-            return user
+            const user = await this.User.findOne({
+                where: { id: userId, deletedAt: null },
+                transaction,
+            });
+            return user;
         } catch (err) {
-            throw err
+            throw err;
         }
     }
 
     async getUserByEmail(email, transaction = null) {
         try {
-            const user = await this.User.findOne({ where: { email: email, deletedAt: null }, transaction })
-            return user
+            const user = await this.User.findOne({
+                where: { email: email, deletedAt: null },
+                transaction,
+            });
+            return user;
         } catch (err) {
-            throw err
+            throw err;
         }
     }
     async getUserByUsername(username, transaction = null) {
         try {
-            const user = await this.User.findOne({ where: { username: username, deletedAt: null }, transaction })
-            return user
+            const user = await this.User.findOne({
+                where: { username: username, deletedAt: null },
+                transaction,
+            });
+            return user;
         } catch (err) {
-            throw err
+            throw err;
         }
     }
 }

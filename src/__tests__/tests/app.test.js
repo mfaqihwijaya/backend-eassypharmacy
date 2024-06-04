@@ -524,26 +524,6 @@ describe('USER', () => {
             );
         });
     });
-    describe('when database request fail', () => {
-        beforeEach(async () => {
-            sinon.stub(db.User, 'findOne').throws(new Error('error database'));
-        });
-        test('should return status code internal server error 500', async () => {
-            const response = await request(app)
-                .get(path)
-                .set('Authorization', `Bearer ${userToken}`);
-            expect(response.statusCode).toBe(
-                RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR
-            );
-        });
-        test('should respond with error response', async () => {
-            const response = await request(app)
-                .get(path)
-                .set('Authorization', `Bearer ${userToken}`);
-            expect(response.body[0]).toHaveProperty('error');
-            expect(response.body[0]).toHaveProperty('message');
-        });
-    });
 });
 
 describe('MEDICINE ORDER', () => {
@@ -553,7 +533,6 @@ describe('MEDICINE ORDER', () => {
     let createMedicineOrderStub;
     let updateMedicineOrderStub;
     let deleteMedicineOrderStub;
-    let getUserStub;
     const loggedInUser = {
         id: 4,
         username: 'mfaqihw',
@@ -1271,4 +1250,763 @@ describe('MEDICINE ORDER', () => {
     });
 });
 
-describe('ORDER', () => {});
+describe('ORDER', () => {
+    let getUserStub;
+    let getMedicineOrdersStub;
+    let getOrdersStub;
+    let getOrderStub;
+    let createOrderStub;
+    let updateOrderStub;
+    let updateMedicineOrder;
+    let updateMedicine;
+    const loggedInUser = {
+        id: 4,
+        username: 'mfaqihw',
+        email: 'faqih.wijaya@bithealth.co.id',
+        phoneNumber: null,
+        address: 'Yogyakarta',
+    };
+    afterEach(async () => {
+        sinon.restore();
+    });
+    beforeEach(async () => {
+        // for grant authorization
+        getUserStub = sinon.stub(db.User, 'findOne').callsFake((args) => {
+            if (args.where.id == loggedInUser.id) {
+                return Promise.resolve(loggedInUser);
+            }
+        });
+        getMedicineStub = sinon.stub(db.Medicine, 'findOne');
+        getOrderStub = sinon.stub(db.Order, 'findOne');
+        getOrdersStub = sinon.stub(db.Order, 'findAll');
+        createOrderStub = sinon.stub(db.Order, 'create');
+        updateOrderStub = sinon.stub(db.Order, 'update');
+        getMedicineOrdersStub = sinon.stub(db.MedicineOrder, 'findAll');
+        updateMedicine = sinon.stub(db.Medicine, 'update');
+        updateMedicineOrder = sinon.stub(db.MedicineOrder, 'update');
+    });
+    describe('CHECKOUT', () => {
+        const path = '/api/v1/orders';
+        describe('when success checking out', () => {
+            const payload = {
+                medicineOrderIds: [1, 2],
+            };
+            const medicine1 = { id: 1, ...medicines[0] };
+            const medicine2 = { id: 2, ...medicines[1] };
+            const medicineOrders = [
+                {
+                    userId: loggedInUser.id,
+                    medicineId: medicine1.id,
+                    orderId: null,
+                    count: 1,
+                    subTotal: medicine1.price,
+                    createdAt: new Date(),
+                },
+                {
+                    userId: loggedInUser.id,
+                    medicineId: medicine2.id,
+                    orderId: null,
+                    count: 2,
+                    subTotal: medicine2.price * 2,
+                    createdAt: new Date(),
+                },
+            ];
+            const createdOrder = {
+                userId: loggedInUser.id,
+                total: medicineOrders.reduce(
+                    (acc, cur) => acc + cur.subTotal,
+                    0
+                ),
+                status: 0,
+                address: loggedInUser.address,
+                paidAt: null,
+            };
+            beforeEach(async () => {
+                getMedicineOrdersStub.callsFake((args1, args2) => {
+                    if (
+                        args1.where.id[db.Sequelize.Op.in].toString() ==
+                        payload.medicineOrderIds.toString()
+                    ) {
+                        return Promise.resolve(medicineOrders);
+                    }
+                });
+                createOrderStub.callsFake((args1, args2) => {
+                    if (args1.userId == loggedInUser.id) {
+                        return Promise.resolve(createdOrder);
+                    }
+                });
+                getMedicineStub.callsFake((args1, args2) => {
+                    return Promise.resolve(
+                        args1.where.id == medicine1.id ? medicine1 : medicine2
+                    );
+                });
+                updateMedicineOrder.resolves([0]);
+                updateMedicine.resolves(null);
+            });
+            test('should return status code created 201', async () => {
+                const response = await request(app)
+                    .post(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.CREATED);
+            });
+            test('should return created order', async () => {
+                const response = await request(app)
+                    .post(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.body.data).toHaveProperty('userId');
+                expect(response.body.data).toHaveProperty('total');
+                expect(response.body.data).toHaveProperty('status');
+                expect(response.body.data).toHaveProperty('address');
+                expect(response.body.data).toHaveProperty('paidAt');
+            });
+        });
+        describe('when request body is not valid', () => {
+            const notValidPayload = {
+                medicineOrderIds: 1,
+            };
+            test('should return status code bad request 400', async () => {
+                const response = await request(app)
+                    .post(path)
+                    .send(notValidPayload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.BAD_REQUEST
+                );
+            });
+            test('should return error response', async () => {
+                const response = await request(app)
+                    .post(path)
+                    .send(notValidPayload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.body[0]).toHaveProperty('error');
+                expect(response.body[0]).toHaveProperty('message');
+                expect(response.body[0].error).toBe(
+                    ErrorType.ERROR_ORDER_CHECKOUT
+                );
+            });
+        });
+        describe('when there are medicine orders that cant be checked out', () => {
+            const payload = {
+                medicineOrderIds: [1, 2],
+            };
+            beforeEach(async () => {
+                getMedicineOrdersStub.callsFake((args1, args2) => {
+                    if (
+                        args1.where.id[db.Sequelize.Op.in].toString() ==
+                        payload.medicineOrderIds.toString()
+                    ) {
+                        return Promise.resolve([]);
+                    }
+                });
+            });
+            test('should return not found 404', async () => {
+                const response = await request(app)
+                    .post(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.NOT_FOUND
+                );
+            });
+            test('should return error response', async () => {
+                const response = await request(app)
+                    .post(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.body[0]).toHaveProperty('error');
+                expect(response.body[0]).toHaveProperty('message');
+                expect(response.body[0].error).toBe(
+                    ErrorType.ERROR_ORDER_CHECKOUT
+                );
+            });
+        });
+        describe('when medicine order userdId isnt match the logged in user', () => {
+            const payload = {
+                medicineOrderIds: [1, 2],
+            };
+            const medicine1 = { id: 1, ...medicines[0] };
+            const medicine2 = { id: 2, ...medicines[1] };
+            const medicineOrders = [
+                {
+                    userId: loggedInUser.id + 1,
+                    medicineId: medicine1.id,
+                    orderId: null,
+                    count: 1,
+                    subTotal: medicine1.price,
+                    createdAt: new Date(),
+                },
+                {
+                    userId: loggedInUser.id + 2,
+                    medicineId: medicine2.id,
+                    orderId: null,
+                    count: 2,
+                    subTotal: medicine2.price * 2,
+                    createdAt: new Date(),
+                },
+            ];
+            const createdOrder = {
+                userId: loggedInUser.id,
+                total: medicineOrders.reduce(
+                    (acc, cur) => acc + cur.subTotal,
+                    0
+                ),
+                status: 0,
+                address: loggedInUser.address,
+                paidAt: null,
+            };
+            beforeEach(async () => {
+                getMedicineOrdersStub.callsFake((args1, args2) => {
+                    if (
+                        args1.where.id[db.Sequelize.Op.in].toString() ==
+                        payload.medicineOrderIds.toString()
+                    ) {
+                        return Promise.resolve(medicineOrders);
+                    }
+                });
+                createOrderStub.callsFake((args1, args2) => {
+                    if (args1.userId == loggedInUser.id) {
+                        return Promise.resolve(createdOrder);
+                    }
+                });
+            });
+            test('should return forbidden 403', async () => {
+                const response = await request(app)
+                    .post(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.FORBIDDEN
+                );
+            });
+            test('should return error response', async () => {
+                const response = await request(app)
+                    .post(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.body[0]).toHaveProperty('error');
+                expect(response.body[0]).toHaveProperty('message');
+                expect(response.body[0].error).toBe(
+                    ErrorType.ERROR_ORDER_CHECKOUT
+                );
+                expect(response.body[0].message).toBe(
+                    ErrorMessage.ERROR_RESTRICTED_ACCESS
+                );
+            });
+        });
+        describe('when the medicine isnt available', () => {
+            const payload = {
+                medicineOrderIds: [1, 2],
+            };
+            const medicine1 = { id: 1, ...medicines[0] };
+            const medicine2 = { id: 2, ...medicines[1] };
+            const medicineOrders = [
+                {
+                    userId: loggedInUser.id,
+                    medicineId: medicine1.id,
+                    orderId: null,
+                    count: 1,
+                    subTotal: medicine1.price,
+                    createdAt: new Date(),
+                },
+                {
+                    userId: loggedInUser.id,
+                    medicineId: medicine2.id,
+                    orderId: null,
+                    count: 2,
+                    subTotal: medicine2.price * 2,
+                    createdAt: new Date(),
+                },
+            ];
+            const createdOrder = {
+                userId: loggedInUser.id,
+                total: medicineOrders.reduce(
+                    (acc, cur) => acc + cur.subTotal,
+                    0
+                ),
+                status: 0,
+                address: loggedInUser.address,
+                paidAt: null,
+            };
+            beforeEach(async () => {
+                getMedicineOrdersStub.callsFake((args1, args2) => {
+                    if (
+                        args1.where.id[db.Sequelize.Op.in].toString() ==
+                        payload.medicineOrderIds.toString()
+                    ) {
+                        return Promise.resolve(medicineOrders);
+                    }
+                });
+                createOrderStub.callsFake((args1, args2) => {
+                    if (args1.userId == loggedInUser.id) {
+                        return Promise.resolve(createdOrder);
+                    }
+                });
+                getMedicineStub.callsFake((args1, args2) => {
+                    if (
+                        args1.where.id == medicine1.id ||
+                        args1.where.id == medicine2.id
+                    ) {
+                        return Promise.resolve(null);
+                    }
+                });
+            });
+            test('should return not found 404', async () => {
+                const response = await request(app)
+                    .post(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.NOT_FOUND
+                );
+            });
+            test('should return error response', async () => {
+                const response = await request(app)
+                    .post(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.body[0]).toHaveProperty('error');
+                expect(response.body[0]).toHaveProperty('message');
+                expect(response.body[0].error).toBe(
+                    ErrorType.ERROR_ORDER_CHECKOUT
+                );
+                expect(response.body[0].message).toBe(
+                    ErrorMessage.ERROR_MEDICINE_NOT_FOUND
+                );
+            });
+        });
+        describe('when the medicine stock is not enough anymore', () => {
+            const payload = {
+                medicineOrderIds: [1, 2],
+            };
+            const medicine1 = { id: 1, ...medicines[0], stock: 0 };
+            const medicine2 = { id: 2, ...medicines[1], stock: 0 };
+            const medicineOrders = [
+                {
+                    userId: loggedInUser.id,
+                    medicineId: medicine1.id,
+                    orderId: null,
+                    count: 1,
+                    subTotal: medicine1.price,
+                    createdAt: new Date(),
+                },
+                {
+                    userId: loggedInUser.id,
+                    medicineId: medicine2.id,
+                    orderId: null,
+                    count: 2,
+                    subTotal: medicine2.price * 2,
+                    createdAt: new Date(),
+                },
+            ];
+            const createdOrder = {
+                userId: loggedInUser.id,
+                total: medicineOrders.reduce(
+                    (acc, cur) => acc + cur.subTotal,
+                    0
+                ),
+                status: 0,
+                address: loggedInUser.address,
+                paidAt: null,
+            };
+            beforeEach(async () => {
+                getMedicineOrdersStub.callsFake((args1, args2) => {
+                    if (
+                        args1.where.id[db.Sequelize.Op.in].toString() ==
+                        payload.medicineOrderIds.toString()
+                    ) {
+                        return Promise.resolve(medicineOrders);
+                    }
+                });
+                createOrderStub.callsFake((args1, args2) => {
+                    if (args1.userId == loggedInUser.id) {
+                        return Promise.resolve(createdOrder);
+                    }
+                });
+                getMedicineStub.callsFake((args1, args2) => {
+                    return Promise.resolve(
+                        args1.where.id == medicine1.id ? medicine1 : medicine2
+                    );
+                });
+            });
+            test('should return bad request 400', async () => {
+                const response = await request(app)
+                    .post(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.BAD_REQUEST
+                );
+            });
+            test('should return error response', async () => {
+                const response = await request(app)
+                    .post(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.body[0]).toHaveProperty('error');
+                expect(response.body[0]).toHaveProperty('message');
+                expect(response.body[0].error).toBe(
+                    ErrorType.ERROR_ORDER_CHECKOUT
+                );
+                expect(response.body[0].message).toBe(
+                    ErrorMessage.ERROR_MEDICINE_NOT_ENOUGH
+                );
+            });
+        });
+        describe('when create order database fail', () => {
+            const payload = {
+                medicineOrderIds: [1, 2],
+            };
+            const medicine1 = { id: 1, ...medicines[0] };
+            const medicine2 = { id: 2, ...medicines[1] };
+            const medicineOrders = [
+                {
+                    userId: loggedInUser.id + 1,
+                    medicineId: medicine1.id,
+                    orderId: null,
+                    count: 1,
+                    subTotal: medicine1.price,
+                    createdAt: new Date(),
+                },
+                {
+                    userId: loggedInUser.id + 2,
+                    medicineId: medicine2.id,
+                    orderId: null,
+                    count: 2,
+                    subTotal: medicine2.price * 2,
+                    createdAt: new Date(),
+                },
+            ];
+            const createdOrder = {
+                userId: loggedInUser.id,
+                total: medicineOrders.reduce(
+                    (acc, cur) => acc + cur.subTotal,
+                    0
+                ),
+                status: 0,
+                address: loggedInUser.address,
+                paidAt: null,
+            };
+            beforeEach(async () => {
+                getMedicineOrdersStub.callsFake((args1, args2) => {
+                    if (
+                        args1.where.id[db.Sequelize.Op.in].toString() ==
+                        payload.medicineOrderIds.toString()
+                    ) {
+                        return Promise.resolve(medicineOrders);
+                    }
+                });
+                createOrderStub.throws(new Error('create order database fail'));
+            });
+            test('should return internal server error 500', async () => {
+                const response = await request(app)
+                    .post(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR
+                );
+            });
+        });
+    });
+    describe('GET MY ORDERS', () => {
+        const path = '/api/v1/orders';
+        const orders = [
+            {
+                userId: loggedInUser.id,
+                total: 100000,
+                status: 0,
+                address: loggedInUser.address,
+                paidAt: null,
+            },
+            {
+                userId: loggedInUser.id,
+                total: 200000,
+                status: 0,
+                address: loggedInUser.address,
+                paidAt: null,
+            },
+        ];
+        beforeEach(async () => {
+            getOrdersStub.callsFake((args) => {
+                if (args.where.userId == loggedInUser.id) {
+                    return Promise.resolve(orders);
+                }
+            });
+        });
+        describe('when get my orders success', () => {
+            test('should return status code 200', async () => {
+                const response = await request(app)
+                    .get(path)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.OK);
+            });
+            test('should return an array of orders', async () => {
+                const response = await request(app)
+                    .get(path)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.body.data).toBeInstanceOf(Array);
+            });
+        });
+        describe('when get my orders database fail', () => {
+            beforeEach(async () => {
+                getOrdersStub.throws(new Error('get my orders database fail'));
+            });
+            test('should return internal server error 500', async () => {
+                const response = await request(app)
+                    .get(path)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR
+                );
+            });
+        });
+    });
+    describe('GET ORDER BY ID', () => {
+        const path = '/api/v1/orders/:orderId';
+        const order = {
+            userId: loggedInUser.id,
+            total: 100000,
+            status: 0,
+            address: loggedInUser.address,
+            paidAt: null,
+        };
+        describe('when get order success', () => {
+            beforeEach(async () => {
+                getOrderStub.resolves(order);
+            });
+            test('should return status code 200', async () => {
+                const response = await request(app)
+                    .get(path)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.OK);
+            });
+            test('should return an object of order', async () => {
+                const response = await request(app)
+                    .get(path)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.body.data).toHaveProperty('userId');
+                expect(response.body.data).toHaveProperty('total');
+                expect(response.body.data).toHaveProperty('status');
+                expect(response.body.data).toHaveProperty('address');
+                expect(response.body.data).toHaveProperty('paidAt');
+            });
+        });
+        describe('when get order database fail', () => {
+            beforeEach(async () => {
+                getOrderStub.throws(new Error('get order database fail'));
+            });
+            test('should return internal server error 500', async () => {
+                const response = await request(app)
+                    .get(path)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR
+                );
+            });
+        });
+        describe('when get order not found', () => {
+            beforeEach(async () => {
+                getOrderStub.resolves(null);
+            });
+            test('should return not found 404', async () => {
+                const response = await request(app)
+                    .get(path)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.NOT_FOUND
+                );
+            });
+        });
+        describe('when user doesnt have access', () => {
+            beforeEach(async () => {
+                getOrderStub.resolves({
+                    ...order,
+                    userId: loggedInUser.id + 1,
+                });
+            });
+            test('should return forbidden 403', async () => {
+                const response = await request(app)
+                    .get(path)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.FORBIDDEN
+                );
+            });
+            test('should return an error response', async () => {
+                const response = await request(app)
+                    .get(path)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.body[0]).toHaveProperty('error');
+                expect(response.body[0]).toHaveProperty('message');
+                expect(response.body[0].message).toBe(
+                    ErrorMessage.ERROR_RESTRICTED_ACCESS
+                );
+            });
+        });
+    });
+    describe('UPDATE ORDER ADDRESS', () => {
+        const path = '/api/v1/orders/:orderId';
+        const order = {
+            userId: loggedInUser.id,
+            total: 100000,
+            status: 0,
+            address: loggedInUser.address,
+            paidAt: null,
+        };
+        describe('when update order address success', () => {
+            const payload = {
+                address: loggedInUser.address + ' updated',
+            };
+            beforeEach(async () => {
+                getOrderStub.resolves(order);
+                updateOrderStub.resolves([1]);
+            });
+            test('should return status code 200', async () => {
+                const response = await request(app)
+                    .put(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.OK);
+            });
+            test('should return an object of order', async () => {
+                const response = await request(app)
+                    .put(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.body.data).toHaveProperty('affectedRows');
+            });
+        });
+        describe('when order not found', () => {
+            const payload = {
+                address: loggedInUser.address + ' updated',
+            };
+            beforeEach(async () => {
+                getOrderStub.resolves(null);
+            });
+            test('should return status code not found 404', async () => {
+                const response = await request(app)
+                    .put(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.NOT_FOUND
+                );
+            });
+            test('should return an error response', async () => {
+                const response = await request(app)
+                    .put(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.body[0]).toHaveProperty('error');
+                expect(response.body[0]).toHaveProperty('message');
+            });
+        });
+        describe('when order is paid or cancelled', () => {
+            const payload = {
+                address: loggedInUser.address + ' updated',
+            };
+            beforeEach(async () => {
+                getOrderStub.resolves({
+                    ...order,
+                    status: 1,
+                });
+            });
+            test('should return status code bad request 400', async () => {
+                const response = await request(app)
+                    .put(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.BAD_REQUEST
+                );
+            });
+            test('should return an error response', async () => {
+                const response = await request(app)
+                    .put(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.body[0]).toHaveProperty('error');
+                expect(response.body[0]).toHaveProperty('message');
+                expect(response.body[0].message).toBe(
+                    ErrorMessage.ERROR_ORDER_NOT_WAITING
+                );
+            });
+        });
+        describe('when user doesnt have access', () => {
+            const payload = {
+                address: loggedInUser.address + ' updated',
+            };
+            beforeEach(async () => {
+                getOrderStub.resolves({
+                    ...order,
+                    userId: loggedInUser.id + 1,
+                });
+            });
+            test('should return forbidden 403', async () => {
+                const response = await request(app)
+                    .put(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.FORBIDDEN
+                );
+            });
+            test('should return an error response', async () => {
+                const response = await request(app)
+                    .put(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.body[0]).toHaveProperty('error');
+                expect(response.body[0]).toHaveProperty('message');
+                expect(response.body[0].message).toBe(
+                    ErrorMessage.ERROR_RESTRICTED_ACCESS
+                );
+            });
+        });
+        describe('when update order address database fail', () => {
+            const payload = {
+                address: loggedInUser.address + ' updated',
+            };
+            beforeEach(async () => {
+                getOrderStub.resolves(order);
+                updateOrderStub.throws(new Error('update order database fail'));
+            });
+            test('should return internal server error 500', async () => {
+                const response = await request(app)
+                    .put(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR
+                );
+            });
+        });
+    });
+    describe('CANCEL ORDER', () => {
+        const path = '/api/v1/orders/:orderId/cancel';
+        const order = {
+            userId: loggedInUser.id,
+            total: 100000,
+            status: 1,
+            address: loggedInUser.address,
+            paidAt: null,
+        }
+        describe('when cancel order success', () => {
+            
+        })
+        describe('when order not found', () => {
+            
+        })
+        describe('when order is paid or cancelled', () => {
+
+        })
+        describe('when user doesnt have access', () => {
+
+        })
+        describe('when one or more medicine is not found', () => {
+            
+        })
+    });
+});
