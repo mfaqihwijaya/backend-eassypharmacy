@@ -1921,6 +1921,20 @@ describe('ORDER', () => {
                 expect(response.body.data).toHaveProperty('affectedRows');
             });
         });
+        describe('when update payload is invalid', () => {
+            const payload = {
+                address: 23,
+            };
+            test('should return status code bad request 400', async () => {
+                const response = await request(app)
+                    .put(path)
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.BAD_REQUEST
+                );
+            });
+        })
         describe('when order not found', () => {
             const payload = {
                 address: loggedInUser.address + ' updated',

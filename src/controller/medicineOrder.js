@@ -39,7 +39,7 @@ class MedicineOrderController {
             res.status(RESPONSE_STATUS_CODE.OK).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_ORDER_FETCH, err.message)]
-            res.status(RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR).send(errs)
+            res.status(err.status? err.status: RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR).send(errs)
         }
     }
     async deleteMedicineOrder(req, res) {
@@ -76,7 +76,7 @@ class MedicineOrderController {
             res.status(RESPONSE_STATUS_CODE.OK).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_MEDICINE_FETCH, err.message)]
-            res.status(RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR).send(errs)
+            res.status(err.status? err.status: RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR).send(errs)
         }
     }
 }

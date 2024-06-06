@@ -3,7 +3,7 @@ class UserPostgres {
         this.User = db.User;
     }
 
-    async createUser(user, transaction = null) {
+    async createUser(user, transaction) {
         await this.User.create(user, { transaction });
     }
 
@@ -22,7 +22,7 @@ class UserPostgres {
         });
         return user;
     }
-    async getUserByUsername(username, transaction = null) {
+    async getUserByUsername(username, transaction) {
         const user = await this.User.findOne({
             where: { username: username, deletedAt: null },
             transaction,

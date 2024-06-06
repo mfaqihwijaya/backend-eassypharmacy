@@ -6,7 +6,7 @@ class MedicineOrderPostgres {
         this.Medicine = db.Medicine;
     }
 
-    async createMedicineOrder(medicineOrder, transaction = null) {
+    async createMedicineOrder(medicineOrder, transaction) {
         await this.MedicineOrder.create(medicineOrder, { transaction });
     }
 
@@ -37,14 +37,14 @@ class MedicineOrderPostgres {
         });
         return medicineOrder;
     }
-    async getMedicineOrderByOrderId(orderId, transaction = null) {
+    async getMedicineOrderByOrderId(orderId, transaction) {
         const medicineOrders = await this.MedicineOrder.findAll({
             where: { orderId: orderId, deletedAt: null },
             transaction,
         });
         return medicineOrders;
     }
-    async getMedicineOrderByIds(medicineOrderIds, transaction = null) {
+    async getMedicineOrderByIds(medicineOrderIds, transaction) {
         const medicineOrders = await this.MedicineOrder.findAll({
             where: {
                 id: {
@@ -64,7 +64,7 @@ class MedicineOrderPostgres {
         });
         return medicineOrder;
     }
-    async updateMedicineOrder(medicineOrder, transaction = null) {
+    async updateMedicineOrder(medicineOrder, transaction) {
         const [affectedRows] = await this.MedicineOrder.update(
             medicineOrder,
             {
@@ -74,7 +74,7 @@ class MedicineOrderPostgres {
         );
         return affectedRows;
     }
-    async deleteMedicineOrder(medicineOrderId, transaction = null) {
+    async deleteMedicineOrder(medicineOrderId, transaction) {
         const affectedRows = await this.MedicineOrder.destroy({
             where: { id: medicineOrderId, orderId: null },
             transaction,

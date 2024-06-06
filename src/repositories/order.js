@@ -5,13 +5,13 @@ class OrderPostgres {
         this.MedicineOrder = db.MedicineOrder
         this.Medicine = db.Medicine
     }
-    async createOrder(order, transaction = null) {
+    async createOrder(order, transaction) {
         const newOrder = await this.Order.create(order, { transaction })
         return newOrder
     }
     // TODO jadikan bisa filter by status, default no filter by status
     // TODO order by created at
-    async getOrders(userId, transaction = null) {
+    async getOrders(userId, transaction) {
         const orders = await this.Order.findAll({
             where: { userId, status: 0, deletedAt: null },
             attributes: { exclude: ['deletedAt', 'updatedAt'] },
@@ -36,7 +36,7 @@ class OrderPostgres {
         return orders
     }
 
-    async getOrderById(orderId, transaction = null) {
+    async getOrderById(orderId, transaction) {
         const order = await this.Order.findOne({ 
             where: { id: orderId, deletedAt: null },
             attributes: { exclude: ['deletedAt', 'updatedAt'] },
@@ -45,7 +45,7 @@ class OrderPostgres {
         return order
     }
 
-    async updateOrder(orderId, order, transaction = null) {
+    async updateOrder(orderId, order, transaction) {
         const [affectedRows] = await this.Order.update(order, {
                 where: { id: orderId},
                 transaction

@@ -40,7 +40,7 @@ class MedicinePostgres {
         return medicine
     }
 
-    async updateMedicine(medicine, transaction = null) {
+    async updateMedicine(medicine, transaction) {
         await this.Medicine.update(medicine, {
                 where: { id: medicine.id },
                 transaction
