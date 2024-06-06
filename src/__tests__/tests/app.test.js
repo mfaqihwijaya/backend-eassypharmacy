@@ -524,6 +524,24 @@ describe('USER', () => {
             );
         });
     });
+    describe('when access token not provided', () => {
+        test('should return status code unauthorized 401', async () => {
+            const response = await request(app).get(path)
+                .set('Authorization', `Bearer`);
+            expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.UNAUTHORIZED);
+        });
+        test('should return an error respone', async () => {
+            const response = await request(app).get(path);
+            expect(response.body[0]).toHaveProperty('error');
+            expect(response.body[0]).toHaveProperty('message');
+            expect(response.body[0].error).toBe(
+                ErrorType.ERROR_USER_AUTHENTICATION
+            );
+            expect(response.body[0].message).toBe(
+                ErrorMessage.ERROR_REQUIRED_ACCESS_TOKEN
+            );
+        });
+    })
 });
 
 describe('MEDICINE ORDER', () => {
@@ -559,6 +577,15 @@ describe('MEDICINE ORDER', () => {
     });
     describe('CREATE MEDICINE ORDER', () => {
         const path = '/api/v1/medicine-orders';
+        describe('when invalid payload', () => {
+            test('should return status code 400', async () => {
+                const response = await request(app)
+                    .post(path)
+                    .send({})
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.BAD_REQUEST);
+            });
+        })
         describe('when create medicine order success', () => {
             const payload = {
                 medicineId: 5,
@@ -908,6 +935,22 @@ describe('MEDICINE ORDER', () => {
             count: medicineInCart.stock - 1,
             subTotal: medicineInCart.price * 2,
         };
+        describe('when invalid payload', () => {
+            const payload = {
+                quantity: -1,
+            };
+            test('should return status code 400', async () => {
+                const response = await request(app)
+                    .put(
+                        path.replace(':medicineOrderId', updateMedicineOrder.id)
+                    )
+                    .send(payload)
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.BAD_REQUEST
+                );
+            });
+        })
         describe('when update quantity success', () => {
             const payload = {
                 quantity: medicineInCart.stock,

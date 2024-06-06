@@ -12,7 +12,7 @@ class MedicineCategoryController {
             res.status(RESPONSE_STATUS_CODE.OK).send(response)
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_CATEGORY_FETCH, err.message)]
-            res.status(err.status? err.status: RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR).send(errs)
+            res.status(RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR).send(errs)
         }
     }
 }
