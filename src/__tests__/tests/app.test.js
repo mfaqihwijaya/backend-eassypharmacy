@@ -2030,26 +2030,204 @@ describe('ORDER', () => {
     describe('CANCEL ORDER', () => {
         const path = '/api/v1/orders/:orderId/cancel';
         const order = {
+            id: 6,
             userId: loggedInUser.id,
             total: 100000,
-            status: 1,
+            status: 0,
             address: loggedInUser.address,
             paidAt: null,
-        }
+        };
+        const medicine1 = { id: 1, ...medicines[0] };
+        const medicine2 = { id: 2, ...medicines[1] };
+        const medicineOrders = [
+            {
+                userId: loggedInUser.id,
+                medicineId: medicine1.id,
+                orderId: order.id,
+                count: 1,
+                subTotal: medicine1.price,
+                createdAt: new Date(),
+            },
+            {
+                userId: loggedInUser.id,
+                medicineId: medicine2.id,
+                orderId: order.id,
+                count: 2,
+                subTotal: medicine2.price * 2,
+                createdAt: new Date(),
+            },
+        ];
+        order.total = medicineOrders.reduce(
+            (acc, cur) => acc + cur.subTotal,
+            0
+        );
         describe('when cancel order success', () => {
-            
-        })
+            beforeEach(async () => {
+                getOrderStub.callsFake((args) => {
+                    if (args.where.id == order.id) {
+                        return Promise.resolve(order);
+                    }
+                });
+                getMedicineOrdersStub.callsFake((args) => {
+                    if (args.where.orderId == order.id) {
+                        return Promise.resolve(medicineOrders);
+                    }
+                });
+                getMedicineStub.callsFake((args) => {
+                    if (args.where.id == medicine1.id) {
+                        return Promise.resolve(medicine1);
+                    }
+                    if (args.where.id == medicine2.id) {
+                        return Promise.resolve(medicine2);
+                    }
+                });
+                updateOrderStub.callsFake((args1, args2) => {
+                    return Promise.resolve([1]);
+                });
+                updateMedicine.callsFake((args1, args2) => {
+                    return Promise.resolve(null);
+                });
+            });
+            test('should return status code ok 200', async () => {
+                const response = await request(app)
+                    .put(path.replace(':orderId', order.id))
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(RESPONSE_STATUS_CODE.OK);
+            });
+            test('should return a cancel order success response', async () => {
+                const response = await request(app)
+                    .put(path.replace(':orderId', order.id))
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.body.data).toHaveProperty('id');
+                expect(response.body.data).toHaveProperty('status');
+            });
+        });
         describe('when order not found', () => {
-            
-        })
+            beforeEach(async () => {
+                getOrderStub.callsFake((args) => {
+                    if (args.where.id == order.id) {
+                        return Promise.resolve(null);
+                    }
+                });
+            });
+            test('should return not found 404', async () => {
+                const response = await request(app)
+                    .put(path.replace(':orderId', order.id))
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.NOT_FOUND
+                );
+            });
+            test('should return an error response', async () => {
+                const response = await request(app)
+                    .put(path.replace(':orderId', order.id))
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.body[0]).toHaveProperty('error');
+                expect(response.body[0]).toHaveProperty('message');
+                expect(response.body[0].message).toBe(
+                    ErrorMessage.ERROR_ORDER_NOT_FOUND
+                );
+            });
+        });
         describe('when order is paid or cancelled', () => {
-
-        })
+            beforeEach(async () => {
+                getOrderStub.callsFake((args) => {
+                    if (args.where.id == order.id) {
+                        return Promise.resolve({
+                            ...order,
+                            status: 1,
+                        });
+                    }
+                });
+            });
+            test('should return bad request 400', async () => {
+                const response = await request(app)
+                    .put(path.replace(':orderId', order.id))
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.BAD_REQUEST
+                );
+            });
+            test('should return an error response', async () => {
+                const response = await request(app)
+                    .put(path.replace(':orderId', order.id))
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.body[0]).toHaveProperty('error');
+                expect(response.body[0]).toHaveProperty('message');
+                expect(response.body[0].message).toBe(
+                    ErrorMessage.ERROR_ORDER_NOT_WAITING
+                );
+            });
+        });
         describe('when user doesnt have access', () => {
-
-        })
+            beforeEach(async () => {
+                getOrderStub.callsFake((args) => {
+                    if (args.where.id == order.id) {
+                        return Promise.resolve({
+                            ...order,
+                            userId: loggedInUser.id + 1,
+                        });
+                    }
+                });
+            });
+            test('should return forbidden 403', async () => {
+                const response = await request(app)
+                    .put(path.replace(':orderId', order.id))
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.FORBIDDEN
+                );
+            });
+            test('should return an error response', async () => {
+                const response = await request(app)
+                    .put(path.replace(':orderId', order.id))
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.body[0]).toHaveProperty('error');
+                expect(response.body[0]).toHaveProperty('message');
+                expect(response.body[0].message).toBe(
+                    ErrorMessage.ERROR_RESTRICTED_ACCESS
+                );
+            });
+        });
         describe('when one or more medicine is not found', () => {
-            
-        })
+            beforeEach(async () => {
+                getOrderStub.callsFake((args) => {
+                    if (args.where.id == order.id) {
+                        return Promise.resolve(order);
+                    }
+                });
+                getMedicineOrdersStub.callsFake((args) => {
+                    if (args.where.orderId == order.id) {
+                        return Promise.resolve(medicineOrders);
+                    }
+                });
+                getMedicineStub.callsFake((args) => {
+                    if (args.where.id == medicine1.id) {
+                        return Promise.resolve(null);
+                    }
+                    if (args.where.id == medicine2.id) {
+                        return Promise.resolve(null);
+                    }
+                });
+            });
+            test('should return not found 404', async () => {
+                const response = await request(app)
+                    .put(path.replace(':orderId', order.id))
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.statusCode).toBe(
+                    RESPONSE_STATUS_CODE.NOT_FOUND
+                );
+            });
+            test('should return an error response', async () => {
+                const response = await request(app)
+                    .put(path.replace(':orderId', order.id))
+                    .set('Authorization', `Bearer ${userToken}`);
+                expect(response.body[0]).toHaveProperty('error');
+                expect(response.body[0]).toHaveProperty('message');
+                expect(response.body[0].message).toBe(
+                    ErrorMessage.ERROR_MEDICINE_NOT_FOUND
+                );
+            });
+        });
     });
 });
