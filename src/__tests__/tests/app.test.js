@@ -1,14 +1,27 @@
 const request = require('supertest');
 const app = require('../../../app');
 const db = require('../../models/db');
+const jwt = require('jsonwebtoken');
 const sinon = require('sinon');
 const { RESPONSE_STATUS_CODE } = require('../../util/constants');
 const { ErrorType, ErrorMessage } = require('../../models/response');
 const { hashPassword } = require('../../util/crypto');
-const { medicines, emptyMedicineOrder } = require('../helper/constant');
+const { medicines } = require('../helper/constant');
 
-const userToken =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsImlhdCI6MTcxNjY3NzQwMDc4NH0.P3BXm9C_ZXQzo9rqH8w87rulRXizi6s_CdAld4tJVpE';
+const loggedInUser = {
+    id: 4,
+    username: 'mfaqihw',
+    email: 'faqih.wijaya@bithealth.co.id',
+    phoneNumber: null,
+    address: 'Yogyakarta',
+};
+
+const now = new Date()
+const claims = {
+    sub: loggedInUser.id,
+    iat: now.getTime()
+}
+const userToken = jwt.sign(claims, process.env.JWT_SECRET)
 
 beforeAll(async () => {
     try {
@@ -551,13 +564,6 @@ describe('MEDICINE ORDER', () => {
     let createMedicineOrderStub;
     let updateMedicineOrderStub;
     let deleteMedicineOrderStub;
-    const loggedInUser = {
-        id: 4,
-        username: 'mfaqihw',
-        email: 'faqih.wijaya@bithealth.co.id',
-        phoneNumber: null,
-        address: 'Yogyakarta',
-    };
     afterEach(async () => {
         sinon.restore();
     });
@@ -1302,13 +1308,6 @@ describe('ORDER', () => {
     let updateOrderStub;
     let updateMedicineOrder;
     let updateMedicine;
-    const loggedInUser = {
-        id: 4,
-        username: 'mfaqihw',
-        email: 'faqih.wijaya@bithealth.co.id',
-        phoneNumber: null,
-        address: 'Yogyakarta',
-    };
     afterEach(async () => {
         sinon.restore();
     });

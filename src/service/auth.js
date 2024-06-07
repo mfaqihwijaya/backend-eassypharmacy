@@ -1,13 +1,13 @@
 const { ErrorMessage } = require('../models/response')
 const { sequelize } = require("../models/db");
+const process = require('process');
 const { hashPassword, comparePassword } = require('../util/crypto')
 const jwt = require('jsonwebtoken')
 const Token = require('../models/token')
 const { RESPONSE_STATUS_CODE } = require('../util/constants')
 class AuthService {
-    constructor(userRepo, sessionConfig) {
+    constructor(userRepo) {
         this.userRepo = userRepo
-        this.sessionConfig = sessionConfig
     }
     async userRegister(user) {
         try {
@@ -72,7 +72,7 @@ class AuthService {
                 iat: now.getTime()
             }
             // membuat jwt accessToken
-            const accessToken = jwt.sign(claims, this.sessionConfig.secret)
+            const accessToken = jwt.sign(claims, process.env.JWT_SECRET)
             // generate token model
             const tokens = new Token(accessToken)
             return tokens
@@ -82,7 +82,7 @@ class AuthService {
     }
     async validateUserToken(token) {
         try {
-            const decoded = jwt.verify(token, this.sessionConfig.secret);
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
             const { sub } = decoded;
             const user = await this.userRepo.getUserById(sub)
             if(!user) {
