@@ -99,7 +99,6 @@ class OrderService {
                         orderId,
                         t
                     );
-                console.log('faqih', medicineOrders);
                 for (const medicineOrder of medicineOrders) {
                     const { medicineId, count } = medicineOrder;
                     const medicine = await this.medicineRepo.getMedicineById(

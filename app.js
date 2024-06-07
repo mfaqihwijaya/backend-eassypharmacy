@@ -1,13 +1,14 @@
 const express = require("express");
-const config = require("./src/config/common.json");
 const cors = require("cors");
+require('dotenv').config();
+const config = require("./src/config/common")[process.env.NODE_ENV || "development"];
+
 const { UserPostgres } = require("./src/repositories/user")
 const { MedicinePostgres } = require("./src/repositories/medicine")
 const { UserRouter } = require("./src/router/user")
 const { MedicineRouter } = require("./src/router/medicine");
 const { UserService } = require("./src/service/user")
 const { MedicineService } = require("./src/service/medicine")
-const db = require("./src/models/db")
 const { UserController } = require("./src/controller/user");
 const { MedicineController } = require("./src/controller/medicine");
 const { MedicineOrderPostgres } = require("./src/repositories/medicineOrder");
@@ -29,15 +30,16 @@ const { MedicineCategoryController } = require("./src/controller/medicineCategor
 const { MedicineCategoryRouter } = require("./src/router/medicineCategory");
 const { MedicineCategoryPostgres } = require("./src/repositories/medicineCategory");
 const { OrderMiddleware } = require("./src/middlewares/order");
-
+const db = require("./src/models/db")
 
 function serveBackend() {
   const app = prepare()
 
   // running server
-  const env = process.env.NODE_ENV || 'development';
-  const server = app.listen(config.server[env].port, () => {
-    console.log(`server is running on port ${config.server[env].port}`);
+  const port = config.server.port || 3000;
+  const host = config.server.host || 'localhost';
+  const server = app.listen(port, host, () => {
+    console.log(`server is running on ${host}:${port}`);
   });
 
   // events to shut down
@@ -57,7 +59,7 @@ function prepare() {
   // class definitions
   const userRepo = new UserPostgres(db);
 
-  const authService = new AuthService(userRepo, config.session);
+  const authService = new AuthService(userRepo);
   const authController = new AuthController(authService);
 
   const userService = new UserService(userRepo);
