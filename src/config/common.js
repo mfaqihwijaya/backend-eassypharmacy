@@ -15,7 +15,7 @@ module.exports = {
     "production": {
         "server": {
             "host": process.env.HOST_PROD,
-            "port": process.env.PORT_PROD
+            "port": process.env.PORT
         }
     }
 }
