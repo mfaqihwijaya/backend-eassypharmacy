@@ -42,7 +42,7 @@ class MedicineService {
                 pagination: {
                     totalData: countData,
                     currentPage: page,
-                    pageSize: count,
+                    pageSize: medicines.length,
                     totalPage: Math.ceil(countData / count),
                 }
             }
