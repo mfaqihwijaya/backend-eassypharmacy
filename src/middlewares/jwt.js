@@ -18,7 +18,7 @@ class JWTMiddleware {
             next();
         } catch (err) {
             const errs = [new ErrorResponse(ErrorType.ERROR_USER_AUTHENTICATION, err.message)]
-            return res.status(err.status ? err.status : RESPONSE_STATUS_CODE.INTERNAL_SERVER_ERROR).send(errs);
+            return res.status(err.status ? err.status : RESPONSE_STATUS_CODE.UNAUTHORIZED).send(errs);
         }
     }
 }
