@@ -21,6 +21,7 @@ class MedicineOrderPostgres {
                         'id',
                         'name',
                         'description',
+                        'stock',
                         'price',
                         'image',
                     ],
